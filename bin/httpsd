@@ -1,0 +1,22 @@
+#!/bin/bash 
+: <<DOCXX
+Add description: A simple https server
+Author: morgan@morganism.dev
+DATE: Sat  6 Mar 2021 14:56:55 GMT
+DOCXX
+
+cdir="$(pwd)"
+
+fqdn=${1:-localhost}
+port=${2:-8443}
+root=${3:-${cdir}}
+
+echo "Serving: '${cdir}' at 'https://${fqdn}:${port}' in 3 seconds ..." && sleep 1
+
+for s in "2 1"
+do
+  echo -n $s && sleep 1 
+done
+
+
+ruby -r webrick/https -e "WEBrick::HTTPServer.new(Port: ${port}, DocumentRoot: '${root}', SSLEnable: true, SSLCertName: [%w[CN ${fqdn}]] ).start" 

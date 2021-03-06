@@ -1,0 +1,22 @@
+#!/bin/bash
+
+if [[ -z $1 ]]; then
+  echo "Missing filename.\nUsage: $(basename $0) FILE"
+  exit 2
+fi
+
+
+if [[ -e $1 ]]; then
+  vi $1
+  exit $?
+fi
+
+touch $1
+chmod 755 $1
+echo "#!/bin/bash " >> $1
+echo ": <<DOCXX" >> $1
+echo "Add description" >> $1
+echo "Author" >> $1
+echo "DATE: ${date}" >> $1
+echo "DOCXX" >> $1
+vi $1
