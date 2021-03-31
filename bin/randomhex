@@ -1,0 +1,9 @@
+#!/usr/bin/env ruby
+require 'securerandom'
+
+DEFAULT=16
+def arg; @a ||= ARGV.first end
+def int?(n); true if Integer(n) rescue false end 
+def len; ((int?(arg)) ? arg : DEFAULT).to_i end
+
+puts SecureRandom.hex(len)
