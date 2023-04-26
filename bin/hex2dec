@@ -1,0 +1,11 @@
+#!/bin/bash
+H=$1
+
+if [ -z "$H" ]; then 
+  echo "Type a hex number"
+  read hexNum
+  H=$hexNum
+fi
+
+echo -n "The decimal value of $H="
+echo "obase=10; ibase=16; $H" | bc
