@@ -1,6 +1,14 @@
 #!/usr/bin/env python
 
+import sys
+platform = sys.platform
+if platform != "darwin":
+  print("This is an OSX tool.  Bye")
+  print("  - you're running: " + platform)
+  exit()
+
 import Quartz
+
 
 #wl = Quartz.CGWindowListCopyWindowInfo( Quartz.kCGWindowListOptionOnScreenOnly | Quartz.kCGWindowListExcludeDesktopElements, Quartz.kCGNullWindowID)
 wl = Quartz.CGWindowListCopyWindowInfo( Quartz.kCGWindowListOptionAll, Quartz.kCGNullWindowID)
