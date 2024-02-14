@@ -3,7 +3,10 @@
 
 
 
-THISDIR=$(realpath $0)
+THISSCRIPT=$(realpath $0)
+THISDIR=$(dirname $THISSCRIPT)
+echo $THISDIR
+exit
 cd ${HOME}/bin
 for s in $(echo "bak hex2dec httpsd lswin.py json_prettify.rb os randomhex rsa2pem")
 do
