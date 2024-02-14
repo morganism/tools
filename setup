@@ -1,0 +1,26 @@
+#!/bin/bash
+
+THISDIR=$(realpath $0)
+cd ${HOME}/bin
+
+LICENSE
+README.md
+bin
+docs
+setup
+bak
+hex2dec
+httpsd
+json_prettify.rb
+lswin.py
+os
+randomhex
+rsa2pem
+vib
+for s in $(echo "bak hex2dec httpsd lswin.py json_prettify.rb os randomhex rsa2pem")
+do
+  ln -s ${THISDIR}/${s} .
+  echo "linked ${s}"
+done
+
+cd ${THISDIR}
