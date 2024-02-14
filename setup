@@ -1,4 +1,7 @@
 #!/bin/bash
+#
+
+
 
 THISDIR=$(realpath $0)
 cd ${HOME}/bin
@@ -6,6 +9,8 @@ for s in $(echo "bak hex2dec httpsd lswin.py json_prettify.rb os randomhex rsa2p
 do
   ln -s ${THISDIR}/${s} .
   echo "linked ${s}"
+  echo "rm ${HOME}/bin/${S}" >> undo
 done
+chmod 755 undo
 
 cd ${THISDIR}
