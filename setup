@@ -9,7 +9,7 @@ for s in $(echo "bak hex2dec httpsd lswin.py json_prettify.rb os randomhex rsa2p
 do
   ln -s ${THISDIR}/${s} .
   echo "linked ${s}"
-  echo "rm ${HOME}/bin/${S}" >> undo
+  echo "rm ${HOME}/bin/${s}" >> undo
 done
 chmod 755 undo
 
