@@ -10,7 +10,7 @@ exit
 cd ${HOME}/bin
 for s in $(echo "bak hex2dec httpsd lswin.py json_prettify.rb os randomhex rsa2pem")
 do
-  ln -s ${THISDIR}/${s} .
+  ln -s ${THISDIR}/bin/${s} .
   echo "linked ${s}"
   echo "rm ${HOME}/bin/${s}" >> undo
 done
