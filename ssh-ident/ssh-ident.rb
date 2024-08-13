@@ -7,13 +7,9 @@ require 'open3'
 require 'pathname'
 require 'socket'
 
-# Define constants globally
-LOG_ERROR = 1
-LOG_WARN = 2
-LOG_INFO = 3
-LOG_DEBUG = 4
-
-LOG_CONSTANTS = { "LOG_ERROR" => LOG_ERROR, "LOG_WARN" => LOG_WARN, "LOG_INFO" => LOG_INFO, "LOG_DEBUG" => LOG_DEBUG }
+# Constants to replace cryptic numbers
+LOG_CONSTANTS = { "LOG_ERROR" => 1, "LOG_WARN" => 2, "LOG_INFO" => 3, "LOG_DEBUG" => 4 }
+LOG_CONSTANTS.each { |k, v| const_set(k, v) }
 
 def should_print(config, loglevel)
   verbosity = config.get('VERBOSITY')
@@ -63,8 +59,8 @@ class Config
   end
 
   def load
-    path = get('FILE_USER_CONFIG', required: false)
-    return self unless path && File.exist?(path)
+    path = get('FILE_USER_CONFIG')
+    return self unless File.exist?(path)
 
     begin
       @values = eval(File.read(path))
@@ -80,11 +76,9 @@ class Config
     File.expand_path(value.gsub('$HOME', Dir.home))
   end
 
-  def get(parameter, required: true)
+  def get(parameter)
     value = ENV[parameter] || @values[parameter] || DEFAULTS[parameter]
-    if required && !value
-      raise "Parameter '#{parameter}' needs to be defined in config file or defaults"
-    end
+    raise "Parameter '#{parameter}' needs to be defined in config file or defaults" unless value
 
     self.class.expand(value)
   end
@@ -266,10 +260,10 @@ class AgentManager
 end
 
 def autodetect_binary(argv, config)
-  return if config.get('BINARY_SSH', required: false) # Skip if BINARY_SSH is already set
+  return if config.get('BINARY_SSH')
 
   runtime_name = argv[0]
-  if config.get('BINARY_DIR', required: false)
+  if config.get('BINARY_DIR')
     binary_name = File.basename(runtime_name)
     binary_path = File.join(config.get('BINARY_DIR'), binary_name)
     binary_path = File.join(config.get('BINARY_DIR'), 'ssh') unless File.file?(binary_path) && File.executable?(binary_path)
