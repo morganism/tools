@@ -1,22 +1,15 @@
 #!/bin/bash
 
-if [[ -z $1 ]]; then
-  echo "Missing filename.\nUsage: $(basename $0) FILE"
-  exit 2
-fi
-
-
-if [[ -e $1 ]]; then
-  vi $1
-  exit $?
-fi
+[[ -z $1 ]] { echo "Missing filename.\nUsage: $(basename $0) FILE" && exit 2 }  
+[[ -f $1 ]] && {vi $1; exit $?}           # file exists .. edit
+[[ -f $HOME/.env ]] && source $HOME/.env  # source env file
 
 touch $1
 chmod 755 $1
 echo "#!/bin/bash " >> $1
 echo ": <<DOCXX" >> $1
 echo "Add description" >> $1
-echo "Author" >> $1
+echo "Author: $AUTHOR" >> $1
 echo "DATE: ${date}" >> $1
 echo "DOCXX" >> $1
 vi $1
