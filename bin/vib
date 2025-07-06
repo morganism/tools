@@ -1,15 +1,43 @@
 #!/bin/bash
 
-[[ -z $1 ]] { echo "Missing filename.\nUsage: $(basename $0) FILE" && exit 2 }  
-[[ -f $1 ]] && {vi $1; exit $?}           # file exists .. edit
-[[ -f $HOME/.env ]] && source $HOME/.env  # source env file
+usage() {
+    echo "Missing filename.\nUsage: $(basename $0) FILE"
+}
 
-touch $1
-chmod 755 $1
-echo "#!/bin/bash " >> $1
-echo ": <<DOCXX" >> $1
-echo "Add description" >> $1
-echo "Author: $AUTHOR" >> $1
-echo "DATE: ${date}" >> $1
-echo "DOCXX" >> $1
-vi $1
+if [[ -z $1 ]]; then
+    usage
+    exit 1   
+elif [[ $1 =~ ^-h ]]; then
+    usage
+    exit 1
+fi
+
+DIR="$HOME/bin"
+if [[ -f $DIR/$1 ]]; then
+    vi $DIR/$1 ;
+    exit
+else
+    if [[ -f $1 ]]; then
+        vi $1 ;
+        exit
+    else
+       echo oos
+    fi
+fi
+
+if [[ -f "$HOME/.vib" ]]; then
+    source $HOME/.vib   # source default settings file
+fi
+if [[ -f ".vib" ]]; then
+    source .vib   # source default settings file
+fi
+
+touch                      $1
+chmod 755                  $1
+echo '!/bin/bash'       >> $1
+echo ": <<DOCXX"        >> $1
+echo "Add description"  >> $1
+echo "Author: $AUTHOR"  >> $1
+echo "DATE: ${date}"    >> $1
+echo "DOCXX"            >> $1
+vi                         $1
