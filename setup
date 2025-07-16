@@ -1,9 +1,0 @@
-#!/bin/bash
-#
-
-source bin/common.sh # THISSCRIPT, THISDIR
-source bin/functions.sh 
-
-binlink "bak hex2dec httpsd lswin.py json_prettify.rb os randomhex rsa2pem"
-
-

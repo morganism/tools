@@ -1,0 +1,12 @@
+#!/bin/bash
+#
+# i make a symlink for each file in ./bin to $HOME/bin
+#
+cd bin
+for f in $(find . -type f | grep -v $0)
+do
+  FILE="$(realpath $f)"
+  NAME="$(basename $f)"
+  echo "ln -s $FILE $HOME/bin/$NAME"
+  ln -s $FILE $HOME/bin/$NAME
+done
