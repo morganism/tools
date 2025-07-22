@@ -1,0 +1,37 @@
+#!/bin/bash
+#
+# initialise bash
+#
+
+
+
+DIRS=".bootstrap/log .bin src/morganism"
+for d in `echo $DIRS`
+do
+  TS=`eval date +%Y%m%d-%H%M%S.%N`
+  DIR="$HOME/$d"
+  if [[ -d $DIR ]]; then
+    echo "[$TS]test: DIR [$DIR] exists" >> $HOME/.bootstrap/log/setup.log
+  else  
+    cmd="mkdir -p $DIR"
+    `$cmd`
+    rc=$?
+    echo "[$TS]exec: $cmd = $rc" >> $HOME/.bootstrap/log/setup.log
+  fi
+done
+
+if grep -wq ".bootstrap" ~/.profile; then
+  echo "Already Bootstrapped" ; 
+else
+  cat << EOF >> $HOME/.profile
+  if [ -f $HOME/.bootstrap/.profile ]; then
+    source $HOME/.bootstrap/.profile
+  fi
+EOF
+fi
+
+# set PATH so it includes user's private bin if it exists
+if [ -d "$HOME/.bin" ] ; then
+    PATH="$HOME/.bin:$PATH"
+fi
+

@@ -1,0 +1,129 @@
+#!/usr/bin/env python
+
+import re
+import subprocess
+import sys
+from dataclasses import dataclass
+from pathlib import Path
+
+Result = dict[str, list[str]]
+
+ANSI_ESCAPE = re.compile(r'\x1B\[[0-?]*[ -/]*[@-~]')
+
+def strip_ansi(text: str) -> str:
+    return ANSI_ESCAPE.sub('', text)
+
+
+class Ansi:
+    GREEN = "\033[92m"
+    ORANGE = "\033[38;5;214m"
+    RED = "\033[91m"
+    RESET = "\033[0m"
+
+@dataclass
+class Column:
+    name: str
+    width: int
+
+    def __init__(self, name: str) -> None:
+        self.name = name
+        self.width = len(name)
+
+    def title(self) -> str:
+        return self.name.ljust(self.width)
+
+    def update(self, result: Result) -> None:
+        widths = [len(strip_ansi(line)) for line in result[self.name]]
+        self.width = max(self.width, max(widths, default=0))
+
+    def get(self, result: Result, i: int) -> str:
+        lines = result[self.name]
+        s = lines[i] if i < len(lines) else ""
+        visible_len = len(strip_ansi(s))
+        padding = self.width - visible_len
+        return s + " " * padding
+
+
+@dataclass(frozen=True)
+class Schema:
+    columns: list[Column]
+
+    def pretty_print(self, results: list[Result]) -> None:
+        for result in results:
+            for column in self.columns:
+                column.update(result)
+        print(self.delim("┌", "┬", "┐"))
+        print(self.title())
+        for result in results:
+            print(self.delim("├", "┼", "┤"))
+            print(self.row(result))
+        print(self.delim("└", "┴", "┘"))
+
+    def delim(self, left: str, center: str, right: str) -> str:
+        parts: list[str] = []
+        for column in self.columns:
+            parts.append("─" * (column.width + 2))
+        return left + center.join(parts) + right
+
+    def title(self) -> str:
+        result: Result = dict()
+        for column in self.columns:
+            result[column.name] = [column.title()]
+        return self.row(result)
+
+    def row(self, result: Result) -> str:
+        n = max([len(lines) for lines in result.values()])
+        lines: list[str] = []
+        for i in range(n):
+            parts: list[str] = []
+            for column in self.columns:
+                parts.append(column.get(result, i))
+            line = "│ " + " │ ".join(parts) + " │"
+            lines.append(line)
+        return "\n".join(lines)
+
+def colorize_output(lines: list[str]) -> list[str]:
+    colored = []
+    for line in lines:
+        lower = line.lower()
+        if "working tree clean" in lower or "up to date" in lower:
+            color = Ansi.GREEN
+        elif "untracked files" in lower or "nothing added to commit" in lower:
+            color = Ansi.ORANGE
+        elif "detached" in lower or "conflict" in lower or "both modified" in lower:
+            color = Ansi.RED
+        else:
+            color = Ansi.RESET
+        colored.append(f"{color}{line}{Ansi.RESET}")
+    return colored
+
+
+def main(args: list[str]) -> None:
+    cmd = ["git"] + args
+    results: list[Result] = []
+    for repo in Path().rglob(".git"):
+        if repo.stat().st_size <= 0:
+            continue
+        directory = repo.parent
+        result: Result = dict(
+            directory=[str(directory)],
+            output=colorize_output(run(cmd, directory)),
+        )
+        results.append(result)
+
+    print(f"outputs of command: '{' '.join(cmd)}'")
+    schema = Schema([Column("directory"), Column("output")])
+    schema.pretty_print(results)
+
+
+def run(cmd: list[str], directory: Path) -> list[str]:
+    result = subprocess.run(cmd, cwd=directory, capture_output=True, text=True)
+    if result.returncode != 0:
+        raise Exception(result.stderr)
+    lines = result.stdout.splitlines()
+    return [line.expandtabs() for line in lines]
+
+
+if __name__ == "__main__":
+    main(sys.argv[1:])
+

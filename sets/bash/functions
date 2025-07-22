@@ -1,0 +1,14 @@
+
+
+
+vialias() {
+    AFILE="$HOME/.aliases"
+    vi "$AFILE"
+    source "$AFILE"
+}
+
+mcd() {
+    mkdir -p $1
+    pushd $1
+}
+

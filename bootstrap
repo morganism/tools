@@ -1,0 +1,7 @@
+#!/bin/bash
+
+set -euo pipefail
+
+exit 1
+DIRS=".bin .bootstrap src/morganism"
+SETS="bash env git vi 
