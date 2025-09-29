@@ -1,7 +1,41 @@
 #!/bin/bash
 
+source ~/.bin/.functions
+echo "$(THIS_DIR)"
+
 usage() {
-    echo "Missing filename.\nUsage: $(basename $0) FILE"
+    echo "Missing filename.\nUsage: $(basename $0) [-b] file"
+    echo "  where -b FILE .. Create FILE in $HOME/bin"
+}
+
+create_or_edit() {
+    if [[ -z "$1" ]]; then
+        echo "no FILE passed to create_or_edit function"
+        exit 3
+    fi 
+
+    if [[ -f "$HOME/.vib" ]]; then
+        source $HOME/.vib   # source default settings file
+    fi
+    if [[ -f ".vib" ]]; then
+        source .vib   # source default settings file
+    fi
+    RP=$(realpath $1)
+    echo "realpath to '$1' is: $RP"    
+
+    if [[ ! -e $1 ]]; then
+      echo '#!/bin/bash'      >> $1
+      echo ": <<DOCXX"        >> $1
+      echo "Add description"  >> $1
+      echo "Author: $AUTHOR"  >> $1
+      echo "Date: $(date)"    >> $1
+      echo "DOCXX"            >> $1
+      echo ""                 >> $1
+    fi
+    touch                      $1
+    chmod 755                  $1
+    vi                         $1
+    exit
 }
 
 if [[ -z $1 ]]; then
@@ -10,34 +44,30 @@ if [[ -z $1 ]]; then
 elif [[ $1 =~ ^-h ]]; then
     usage
     exit 1
+elif [[ "$1" =~ ^-b ]]; then
+    shift
+
+    if [[ -z $1 ]]; then
+        echo "-b flag but no FILE ¿¿"
+
+        usage
+        exit 2   
+    fi
+    echo "Creating new file in $HOME/bin/$1"
+    create_or_edit "$HOME/bin/$1"
 fi
 
 DIR="$HOME/bin"
 if [[ -f $DIR/$1 ]]; then
-    vi $DIR/$1 ;
+    create_or_edit "$DIR/$1" ;
     exit
 else
     if [[ -f $1 ]]; then
-        vi $1 ;
+        create_or_edit "$1" ;
         exit
     else
-       echo oos
+       echo "no bin no exist file so create"
     fi
 fi
-
-if [[ -f "$HOME/.vib" ]]; then
-    source $HOME/.vib   # source default settings file
-fi
-if [[ -f ".vib" ]]; then
-    source .vib   # source default settings file
-fi
-
-touch                      $1
-chmod 755                  $1
-echo '!/bin/bash'       >> $1
-echo ": <<DOCXX"        >> $1
-echo "Add description"  >> $1
-echo "Author: $AUTHOR"  >> $1
-echo "DATE: ${date}"    >> $1
-echo "DOCXX"            >> $1
-vi                         $1
+echo $1
+create_or_edit $1
