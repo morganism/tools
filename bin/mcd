@@ -1,0 +1,25 @@
+#!/bin/bash
+
+THIS=$(basename $0)
+usage() {
+  echo "Usage: $THIS dirname ; Create and CD to dirname"
+  exit 2
+}
+
+D=$1
+
+if [[ ! -e $D ]]; then
+  $TEMPFILE="/tmp/mcd.`date +%s`.tmp"
+  echo "mkdir -p ${D}" > $TEMPFILE
+  source $TEMPFILE
+  rm $TEMPFILE
+fi
+
+if [[ -d $D ]]; then
+  pushd $D
+  exit 0
+fi
+
+echo "Ooops, $D must exist and is not a directory!"
+file $D
+exit 1

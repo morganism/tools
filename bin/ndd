@@ -1,0 +1,7 @@
+#!/bin/bash
+: <<DOCXX
+Add description
+Author: 
+DATE: 
+DOCXX
+sudo dd if=/dev/sda | gzip -c | ssh user@001 'gunzip -c | sudo dd of=/dev/sda'

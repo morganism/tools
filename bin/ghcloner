@@ -1,0 +1,76 @@
+#!/bin/bash
+: <<DOCXX
+
+____________________________________________________________________
+
+Usage   : ghcloner URL
+Example : ghcloner https://github.com/owner/repo.git
+        :
+Desc    : take a github Code clone URL in the right place
+        : like 'https://github.com/owner/repo.git'
+        : and  'mkdir -p ~/src/owner'
+        : then 'cd $!' && 'git clone https://github.com/owner/repo.git'
+        :              or 'git clone git@github.com:owner/repo.git'
+        :  
+Author  : morgan@morganism.dev
+        :
+Date    : Thu 11 Sep 2025 07:10:17 BST
+____________________________________________________________________
+
+DOCXX
+usage_from_this_file() {
+  for i in $(seq 5 14)
+  do
+    L=$(eval sed '$i!d' $0)
+    echo ":$L"
+  done
+}
+usage() {
+  MSG=$1
+  if [[ -n "$MSG" ]]; then
+    echo "Missing Github URL: $MSG"
+  fi
+
+  echo "Usage:"
+  usage_from_this_file
+  exit 1
+}
+
+# validate github repo url is $1 and format 
+URL=$1
+if [[ -z "$URL" ]]; then
+  usage "Missing URL"
+elif [[ "$URL" =~ ^git ]]; then
+  # good URL so far
+  echo "Cloning $URL - git" 
+elif [[ "$URL" =~ ^http ]]; then
+  # good URL so far
+  echo "Cloning $URL - https"
+else
+  # URL format error
+  usage "URL format error, should begin with 'https' or 'git' and end with '.git'"
+fi
+
+# URL looks like this
+# https://github.com/owner/repo.git
+# git@github.com:owner/repo.git
+
+# funky way to set $OWNER and $REPO
+OWNER_SEMI_REPO=$(echo $URL | sed -e 's|^.*github.com.|OWNER="|' -e 's|/|";REPO="|' -e 's|$|"|')
+eval $OWNER_SEMI_REPO
+echo "."
+
+DIR=~/src/$OWNER
+if [[ ! -d $DIR ]]; then
+  echo "Creating OWNER ($OWNER) Directory : $DIR"
+  mkdir -p $DIR
+fi
+cd $DIR
+REPO_DIR=$(echo $REPO | sed -e 's/\.git//')
+echo "Cloning REPO ($REPO_DIR) into source dir $DIR"
+git clone $URL
+echo "Done"
+echo "We are here: $(pwd)"
+echo "Here's a: 'tree -L 1 $REPO_DIR'"
+tree -L 1 $REPO_DIR
+

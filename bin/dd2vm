@@ -1,0 +1,10 @@
+#!/bin/bash
+: <<DOCXX
+Add description
+Author: 
+DATE: 
+DOCXX
+# Create VM disk image from running system
+sudo dd if=/dev/sda of=vm-image.img
+# Convert to VMware/VirtualBox format
+qemu-img convert -f raw -O vmdk vm-image.img vm-image.vmdk

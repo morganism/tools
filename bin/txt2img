@@ -1,0 +1,99 @@
+#!/bin/bash
+: <<DOCXX
+Add description
+Author: 
+DATE: 
+DOCXX
+#!/usr/bin/env bash
+#
+# txt2img - create PNG and/or JPG images from text
+#
+# Dependencies: ImageMagick (convert)
+#
+
+set -euo pipefail
+
+# Defaults
+SPLIT_ALL=false
+INPUTS=()
+OUTPUT_FORMATS=("png")   # default is PNG (per spec, but note your spec text had a flip)
+IFS_REGEX=""             # optional regex
+
+# Parse arguments
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        -a)
+            SPLIT_ALL=true
+            shift
+            ;;
+        -i|--in=*)
+            if [[ "$1" == -i ]]; then
+                INPUTS+=("$2")
+                shift 2
+            else
+                INPUTS+=("${1#*=}")
+                shift
+            fi
+            ;;
+        -I|--input-record-seperator)
+            IFS_REGEX="$2"
+            shift 2
+            ;;
+        --png)
+            OUTPUT_FORMATS+=("png")
+            shift
+            ;;
+        --jpg)
+            OUTPUT_FORMATS+=("jpg")
+            shift
+            ;;
+        *)
+            echo "Unknown option: $1" >&2
+            exit 1
+            ;;
+    esac
+done
+
+# Deduplicate formats
+OUTPUT_FORMATS=($(printf "%s\n" "${OUTPUT_FORMATS[@]}" | sort -u))
+
+# Gather input text
+if [[ ${#INPUTS[@]} -eq 0 ]]; then
+    if [[ ! -t 0 ]]; then
+        INPUTS+=("$(cat)")
+    fi
+fi
+
+if [[ ${#INPUTS[@]} -eq 0 ]]; then
+    echo "No input text provided. Use -i/--in=TEXT or STDIN." >&2
+    exit 1
+fi
+
+# Split logic
+WORDS=()
+for text in "${INPUTS[@]}"; do
+    if [[ -n "$IFS_REGEX" ]]; then
+        # Split with regex
+        mapfile -t split < <(echo "$text" | grep -oP "$IFS_REGEX")
+        WORDS+=("${split[@]}")
+    elif $SPLIT_ALL; then
+        # Split on whitespace
+        read -ra split <<<"$text"
+        WORDS+=("${split[@]}")
+    else
+        WORDS+=("$text")
+    fi
+done
+
+# Generate images
+count=1
+for word in "${WORDS[@]}"; do
+    for fmt in "${OUTPUT_FORMATS[@]}"; do
+        outfile="img_${count}.${fmt}"
+        echo "Creating $outfile from text: '$word'"
+        magick -background white -fill black -gravity center \
+                -size 400x200 caption:"$word" "$outfile"
+    done
+    ((count++))
+done
+
