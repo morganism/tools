@@ -2,6 +2,7 @@
 #
 # i make a symlink for each file in ./bin to $HOME/bin
 #
+echo "linking bin files"
 cd bin
 for f in $(find . -type f | grep -v $0)
 do
@@ -9,4 +10,14 @@ do
   NAME="$(basename $f)"
   echo "ln -s $FILE $HOME/bin/$NAME"
   ln -s $FILE $HOME/bin/$NAME
+done
+cd ..
+echo "linking dotfiles"
+cd dotfiles
+for f in $(find . -type f | grep -v $0)
+do
+  FILE="$(realpath $f)"
+  NAME="$(basename $f)"
+  echo "ln -s $FILE $HOME/$NAME"
+  ln -s $FILE $HOME/$NAME
 done

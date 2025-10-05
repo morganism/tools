@@ -1,0 +1,20 @@
+alias dcud='docker compose up -d'
+alias ll='ls -liastr'
+alias ll2='ls -liastre@'
+# Mimic Linux 'ip' command on macOS
+alias ip='ifconfig'                       # `ip a` → network interfaces
+alias ipa='ifconfig'                      # shorthand for `ip a`
+alias ipr='netstat -nr'                   # `ip r` → routing table
+alias ipn='networksetup -listallhardwareports'  # shows interface names and MACs
+alias awsprofile='source ~/bin/_awsconsole'
+alias awssel='export AWS_PROFILE=$(cat ~/.config/aws/selected_profile)' 
+alias sbp='source ~/.bash_profile'
+alias vbp='vi ~/.bash_profile && command -v sbp &>/dev/null && sbp'
+alias vma='vi_my_aliases'
+alias vmf='vi_my_functions'
+alias lf='source ~/.my_functions'
+alias smf='source ~/.my_functions'
+alias sma='source ~/.my_aliases'
+alias xx="echo xx $xx"
+alias vbrc='vi ~/.bashrc && source ~/.bashrc'
+. ~/bin/.colours.function

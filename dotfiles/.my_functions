@@ -1,0 +1,73 @@
+# --------------------
+mcd() {           # create and cd
+    mkdir -p $1
+    pushd $1
+}
+vi_my_aliases() {
+  #-----------
+  #--- vma ---
+  #-----------
+  vi ~/.my_aliases
+  source ~/.my_aliases
+}
+vi_my_functions() {
+  #-----------
+  #--- vmf ---
+  #-----------
+  vi ~/.my_functions
+  source ~/.my_functions
+}
+config_init() {
+  #-----------
+  # setup the .config dir structure if not present
+  #-----------
+  CALL_DIR=$(pwd)
+  
+  # Colors for output
+  RED='\033[0;31m'
+  GREEN='\033[0;32m'
+  YELLOW='\033[1;33m'
+  BLUE='\033[1;34m'
+  NC='\033[0m' # No Color
+
+  echo -e "${BLUE}Checking for ${YELLOW}.config${BLUE} directory in ${YELLOW}${CALL_DIR}${BLUE} ... ${NC}"
+
+  if [[ -d "${CALL_DIR}/.config" ]]; then
+    echo -e "${YELLOW}.config${GREEN} directory exists.${NC}"
+  else
+    echo -e "${RED}Missing ${YELLOW}.config ${BLUE} directory structure, creating ... ${NC}"
+    CONFIG_DIR="${CALL_DIR}/.config"
+    mkdir -p "${CONFIG_DIR}"
+    cd "$CONFIG_DIR"
+    BSF="${CONFIG_DIR}/bootstrap"
+    for f in $(echo "env functions aliases")
+    do
+      touch $f
+      RP=$(realpath $f)
+      echo "source $RP" >> "$BSF"
+      echo -en "${GREEN} . ${NC}"
+    done
+    $(chmod 755 "$BSF")
+    echo -en "${GREEN} . ${NC}"
+  fi
+  echo -e "${GREEN}Finished!${NC}"
+}
+__guess() {
+  echo $0
+  
+}
+cd() {
+  builtin cd "$1" &>/dev/null
+  if [[ "$?" = "0" ]]; then
+    p0=$(realpath "$1")    # actual dest
+    p1="$1"                # typed dest
+    P2=$(realpath "$PWD")  # start dir
+    HIST="/tmp/zd.history"
+    H_P0="/tmp/zd.h_p0"
+    echo "$P0:$P1:$P2" >> $HIST
+    cat $HIST | awk -F: '{print $1}' | sort | uniq -c | sort -rn > $H_P0 
+  else
+    echo "Opportunity to guess"
+    __guess $1
+  fi
+}
