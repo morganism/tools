@@ -17,4 +17,5 @@ alias smf='source ~/.my_functions'
 alias sma='source ~/.my_aliases'
 alias xx="echo xx $xx"
 alias vbrc='vi ~/.bashrc && source ~/.bashrc'
+alias cds='pushd ~/src/morganism'
 . ~/bin/.colours.function
