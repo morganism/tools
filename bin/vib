@@ -1,7 +1,11 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 source ~/.bin/.functions
-echo "$(THIS_DIR)"
+[[ -f .ansi.colours ]] && source .ansi.colours
+
+echo -e "${Blue}N.B. ${White}vi${Blue} is aliased to ${IBlue}${0}${NC}"
+echo -e "${Blue}here: ${IBlue}$(THIS_DIR)${NC}"
+sleep 1
 
 usage() {
     echo "Missing filename.\nUsage: $(basename $0) [-b] file"
@@ -24,17 +28,17 @@ create_or_edit() {
     echo "realpath to '$1' is: $RP"    
 
     if [[ ! -e $1 ]]; then
-      echo '#!/bin/bash'      >> $1
-      echo ": <<DOCXX"        >> $1
-      echo "Add description"  >> $1
-      echo "Author: $AUTHOR"  >> $1
-      echo "Date: $(date)"    >> $1
-      echo "DOCXX"            >> $1
-      echo ""                 >> $1
+      echo '#!/usr/bin/env bash' >> $1
+      echo ": <<DOCXX"           >> $1
+      echo "Add description"     >> $1
+      echo "Author: $AUTHOR"     >> $1
+      echo "Date: $(date)"       >> $1
+      echo "DOCXX"               >> $1
+      echo ""                    >> $1
     fi
-    touch                      $1
-    chmod 755                  $1
-    vi                         $1
+    touch                           $1
+    chmod 755                       $1
+    vi                              $1
     exit
 }
 

@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+: <<DOCXX
+Add description
+Author: morgan@morganism.dev
+Date: Tue 14 Oct 2025 00:01:23 BST
+DOCXX
+
+[[ -f .ansi.colours ]] && source .ansi.colours
+
+if [[ -z "$1" ]]; then
+  echo -e "${Red}No file specified"
+  exit 1
+else
+  if [[ $(command -v $1) ]]; then
+    if [[ $(file $(command -v $1)) =~ text ]]; then
+      echo -e "Command is ${Green}OK${NC}"
+      vi $(command -v $1) 
+    else
+      echo -e "${Red} target is ${IRed}binary${Red} not text${NC}"
+    fi
+  fi
+fi

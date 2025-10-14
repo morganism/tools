@@ -12,9 +12,9 @@ alias sbp='source ~/.bash_profile'
 alias vbp='vi ~/.bash_profile && command -v sbp &>/dev/null && sbp'
 alias vma='vi_my_aliases'
 alias vmf='vi_my_functions'
-alias lf='source ~/.my_functions'
 alias smf='source ~/.my_functions'
 alias sma='source ~/.my_aliases'
-alias xx="echo xx $xx"
 alias vbrc='vi ~/.bashrc && source ~/.bashrc'
-. ~/bin/.colours.function
+alias cds='cd ~ && pushd ~/src/morganism'
+alias tools='pushd ~/src/morganism/tools'
+alias vi='vib'

@@ -1,3 +1,4 @@
+[[ -f ~/ansi.colours ]] && source ~/.ansi.colours
 # --------------------
 mcd() {           # create and cd
     mkdir -p $1
@@ -53,21 +54,21 @@ config_init() {
   echo -e "${GREEN}Finished!${NC}"
 }
 __guess() {
-  echo $0
+  echo $1
   
 }
 cd() {
   builtin cd "$1" &>/dev/null
   if [[ "$?" = "0" ]]; then
-    p0=$(realpath "$1")    # actual dest
-    p1="$1"                # typed dest
-    P2=$(realpath "$PWD")  # start dir
+    P0=$(realpath "$1")    # actual dest
+    P1="$1"                # typed dest
+    P2=$PWD                # start dir
     HIST="/tmp/zd.history"
     H_P0="/tmp/zd.h_p0"
     echo "$P0:$P1:$P2" >> $HIST
     cat $HIST | awk -F: '{print $1}' | sort | uniq -c | sort -rn > $H_P0 
   else
-    echo "Opportunity to guess"
+    echo -e "${IGreen}O${Yellow}p${Cyan}p${Blue}o${Purple}r${BIBlack}t${White}u${Green}n${Red}i${Blue}t${IWhite}y${NC} to guess"
     __guess $1
   fi
 }
