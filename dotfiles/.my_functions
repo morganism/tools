@@ -80,3 +80,10 @@ cd() {
     __guess $1
   fi
 }
+open22() {
+  if [[ -z "$OPENSSH" ]]; then
+    OPENSSH=$(nmap -p22 10.71.157.* --open | grep report | sed -e 's/^.*report for //' -e 's:.* (::' -e 's:)::')
+  fi
+
+  echo $OPENSSH
+}
