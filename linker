@@ -2,13 +2,15 @@
 #
 # i make a symlink for each file in ./bin to $HOME/bin
 #
+
+HOME_BIN="$HOME/bin"         # the bin dir
+
 echo "linking bin files"
 cd bin
 for f in $(find . -type f | grep -v $0)
 do
   FILE="$(realpath $f)"        # the file in git
   NAME="$(basename $f)"        # st the name 
-  HOME_BIN="$HOME/bin"         # the bin dir
   TARGET="${HOME_BIN}/${NAME}" # the target 1
 
   [[ -f "$TARGET" ]] && [[ $(file "$TARGET" | grep "$FILE") ]] && rm "$TARGET" && [[ "$?" = "0" ]] && echo "clean" 
@@ -23,6 +25,13 @@ for f in $(find . -type f | grep -v $0)
 do
   FILE="$(realpath $f)"
   NAME="$(basename $f)"
-  echo "ln -s $FILE $HOME/$NAME"
-  ln -s $FILE $HOME/$NAME
+
+  if [[ -e "${FILE}" ]]; then
+    if [[ -e "${HOME}/${NAME}" ]]; then
+      rm "${HOME}/${NAME}"
+    fi
+
+    echo "ln -s $FILE $HOME/$NAME"
+    ln -s $FILE $HOME/$NAME
+  fi
 done

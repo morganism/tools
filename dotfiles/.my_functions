@@ -9,8 +9,9 @@ colours() {
   NC='\033[0m' # No Color
 }
 mcd() {           # create and cd
-    mkdir -p $1
-    pushd $1
+    [[ -e "$1" ]] && [[ ! -d "$1" ]] && echo "Error: $1 is not a directory" && return 1
+    [[ ! -e "$1" ]] && mkdir -p "$1"
+    [[ -d "$1" ]] && pushd "$1"
 }
 progress() {
   local msg="$1"
