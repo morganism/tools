@@ -12,6 +12,19 @@ mcd() {           # create and cd
     mkdir -p $1
     pushd $1
 }
+progress() {
+  local msg="$1"
+  local total="${2:-100}"
+  local delay="${3:-0.05}"
+
+  echo -n "$msg "
+  for ((i=0; i<=total; i++)); do
+    printf "\r%s %3d%%" "$msg" "$i"
+    sleep "$delay"
+  done
+  echo -e "\r$msg 100% ✓"
+}
+
 vi_my_aliases() {
   #-----------
   #--- vma ---

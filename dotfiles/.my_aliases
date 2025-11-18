@@ -17,4 +17,4 @@ alias sma='source ~/.my_aliases'
 alias vbrc='vi ~/.bashrc && source ~/.bashrc'
 alias cds='cd ~ && pushd ~/src/morganism'
 alias tools='pushd ~/src/morganism/tools'
-alias vi='vib'
+alias ggu='git config --local --get remote.origin.url' # ggu == git get url : the url that you clone
