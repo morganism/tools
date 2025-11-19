@@ -101,3 +101,21 @@ open22() {
 
   echo $OPENSSH
 }
+linktools() {
+  TOOLSDIR="${HOME}/src/morganism/tools"
+  if [[ -d $TOOLSDIR ]]; then
+    cd $TOOLSDIR
+    LINKER_CMD="linker"
+    if [[ -x "${TOOLSDIR}/${LINKER_CMD}" ]]; then
+      echo "Linking tools/bin to ~/bin and tools/dotfiles to ~ ..."
+      ./$LINKER_CMD
+      echo "Linking exited with: $?"
+    else
+      echo "Hmmm .. Linker command ${LINKER_CMD} does not exist here: ${TOOLSDIR}/${LINKER_CMD}."
+      exit 2
+    fi
+  else
+    echo "Git repo 'tools' [git@github.com:morganism/tools.git] is not checked out in the expected location: ${TOOLSDIR}"
+    exit 1
+  fi
+}
