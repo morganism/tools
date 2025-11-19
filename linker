@@ -15,8 +15,9 @@ do
 
   [[ -f "$TARGET" ]] && [[ $(file "$TARGET" | grep "$FILE") ]] && rm "$TARGET" && [[ "$?" = "0" ]] && echo "clean" 
 
-  echo "ln -s $FILE $TARGET"
-  ln -s $FILE $TARGET
+  COMMAND="ln -sf $FILE $TARGET"
+  echo "${COMMAND}"
+  $COMMAND
 done
 cd ..
 echo "linking dotfiles"
@@ -31,7 +32,8 @@ do
       rm "${HOME}/${NAME}"
     fi
 
-    echo "ln -s $FILE $HOME/$NAME"
-    ln -s $FILE $HOME/$NAME
+    COMMAND="ln -sf $FILE $HOME/$NAME"
+    echo "${COMMAND}"
+    $COMMAND
   fi
 done
