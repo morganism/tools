@@ -1,6 +1,15 @@
 #!/usr/bin/env ruby
 require 'securerandom'
 
+# print a random hex number of length 16 or the number supplied 
+# randomehex NUMBER
+
+
+if ARGV.first.match?(/-h/)
+  puts 'randomhex NUMBER : print a random hex nember of length NUMBER'
+  exit 1
+end
+
 DEFAULT=16
 def arg; @a ||= ARGV.first end
 def int?(n); true if Integer(n) rescue false end 
