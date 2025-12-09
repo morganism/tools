@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+: <<DOCXX
+A wrapper around brew to get it to behave *almost* like *apt*"
+Author: morgan@morganism.dev
+Date: Fri  5 Dec 2025 12:12:11 GMT
+DOCXX
+
+# Save as /usr/local/bin/apt and chmod +x it
+
+usage() {
+  echo -e "A brew wrapper to make it behave like apt .. almost"
+  echo -e "apt COMMAND"
+  echo "Supported COMMANDs: install, remove, search, show, list, update, upgrade, autoremove, clean"
+  exit 1
+}
+
+# Strip out -y flag and rebuild args
+args=()
+for arg in "${@:2}"; do
+    [[ "$arg" != "-y" ]] && usage
+    [[ "$arg" != "-y" ]] && args+=("$arg")
+done
+
+case "$1" in
+    install|remove|search|show|list|update|upgrade|autoremove|clean)
+        case "$1" in
+            install) brew install "${args[@]}" ;;
+            remove) brew uninstall "${args[@]}" ;;
+            update) brew update ;;
+            upgrade) 
+                if [ ${#args[@]} -eq 0 ]; then
+                    brew upgrade
+                else
+                    brew upgrade "${args[@]}"
+                fi
+                ;;
+            search) brew search "${args[@]}" ;;
+            show) brew info "${args[@]}" ;;
+            list) brew list "${args[@]}" ;;
+            autoremove) brew autoremove ;;
+            clean) brew cleanup ;;
+        esac
+        ;;
+    *)
+        echo "apt wrapper: unknown command '$1'"
+        echo "Supported: install, remove, search, show, list, update, upgrade, autoremove, clean"
+        exit 1
+        ;;
+esac

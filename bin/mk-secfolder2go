@@ -1,0 +1,58 @@
+#!/USr/bin/env bash
+: <<DOCXX
+Add description
+Author: morgan@morganism.dev
+Date: Fri  5 Dec 2025 19:02:10 GMT
+DOCXX
+
+usage() {
+  THIS=$(realpath "${0}")
+  echo -e "USAGE: $THIS [-v VOLNAME] [-s SIZE] [-u UNIT] [-j JSON]"
+  exit 1
+}
+
+ATTACH=""
+DETACH=""
+DEBUG=""
+VOLNAME=""
+SIZE=""
+UNIT=""
+JSON=""
+
+
+for i in $(seq 1 $#)
+do
+  x=${!i}
+  j=$(echo "${i}+1" | bc)
+  y=${!j}
+  case "${x}" in
+      -a) ATTACH=" -attach " ;;
+      -d) DETACH="1" ;;
+      -D) DEBUG=" -debug " ;;
+      -v) VOLNAME="${y:-VolName}" ;;
+      -s) SIZE="${y:-1}" ;;
+      -u) UNIT="${y:-g}" ;;
+      -j) JSON="${y}" ;;
+      -h) usage ;;
+  esac
+done
+
+if [[ -n "${DETACH}" ]]; then
+  if [[ "${VOLNAME}" =~ VolName ]]; then
+    echo -e "ERROR: Must specify -v VOLNAME"
+    exit 127
+  else
+    CMD="hdiutil detach -force $VOLNAME"
+    $CMD
+    if [[ "$?" =~ 0 ]]; then
+      exit 0
+    else
+      echo -e "ERROR:Detach failed with : $#"
+      exit $#
+    fi 
+  fi
+fi
+
+
+CMD="hdiutil create -size ${SIZE}${UNIT} -type SPARSEBUNDLE -fs APFS -volname ${VOLNAME} -encryption AES-256 -attach $ATTACH $DEBUG ${VOLNAME}.sparsebundle" 
+$CMD
