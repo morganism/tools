@@ -1,1 +1,22 @@
-gh repo list -L500 --json url,name,description -q '.[] | .url +".git§"+ .name +"§"+ .description'
+#!/usr/bin/env bash
+
+# ghrl -v -j 
+# with json out
+# verbose out
+
+FIELDS="url,name"
+JSON=""
+for i in $(seq 1 $#)
+do
+  echo "${i} ${!i}"
+  case "${!i}" in
+      -v) FIELDS="$FIELDS,description" && echo "v";;
+      -j) JSON="1" && echo "j";;
+  esac
+done
+
+if [[ -z "$JSON" ]]; then 
+  gh repo list -L500 --json $FIELDS -q '.[] | .url +".git§"+ .name +"§"+ .description'
+else
+  gh repo list -L500 --json $FIELDS
+fi

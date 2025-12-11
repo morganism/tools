@@ -79,21 +79,21 @@ __guess() {
   echo $1
   
 }
-cd() {
-  builtin cd "$1" &>/dev/null
-  if [[ "$?" = "0" ]]; then
-    P0=$(realpath "$1")    # actual dest
-    P1="$1"                # typed dest
-    P2=$PWD                # start dir
-    HIST="/tmp/zd.history"
-    H_P0="/tmp/zd.h_p0"
-    echo "$P0:$P1:$P2" >> $HIST
-    cat $HIST | awk -F: '{print $1}' | sort | uniq -c | sort -rn > $H_P0 
-  else
-    echo -e "${IGreen}O${Yellow}p${Cyan}p${Blue}o${Purple}r${BIBlack}t${White}u${Green}n${Red}i${Blue}t${IWhite}y${NC} to guess"
-    __guess $1
-  fi
-}
+#cd() {
+  #builtin cd "$1" &>/dev/null
+  #if [[ "$?" = "0" ]]; then
+    #P0=$(realpath "$1")    # actual dest
+    #P1="$1"                # typed dest
+    #P2=$PWD                # start dir
+    #HIST="/tmp/zd.history"
+    #H_P0="/tmp/zd.h_p0"
+    #echo "$P0:$P1:$P2" >> $HIST
+    #cat $HIST | awk -F: '{print $1}' | sort | uniq -c | sort -rn > $H_P0 
+  #else
+    #echo -e "${IGreen}O${Yellow}p${Cyan}p${Blue}o${Purple}r${BIBlack}t${White}u${Green}n${Red}i${Blue}t${IWhite}y${NC} to guess"
+    ##__guess $1
+  #fi
+#}
 open22() {
   if [[ -z "$OPENSSH" ]]; then
     OPENSSH=$(nmap -p22 10.71.157.* --open | grep report | sed -e 's/^.*report for //' -e 's:.* (::' -e 's:)::')
@@ -105,6 +105,7 @@ linktools() {
   TOOLSDIR="${HOME}/src/morganism/tools"
   if [[ -d $TOOLSDIR ]]; then
     cd $TOOLSDIR
+    LINKER_N
     LINKER_CMD="linker"
     if [[ -x "${TOOLSDIR}/${LINKER_CMD}" ]]; then
       echo "Linking tools/bin to ~/bin and tools/dotfiles to ~ ..."
@@ -119,3 +120,24 @@ linktools() {
     exit 1
   fi
 }
+
+rp2pb() {
+  # realpath 2 paste board get the realpath of the file or directory specified as an arg: rp2pb FILE
+
+  realpath $1 | pbcopy
+  echo "realpath of $1 is in pasteboard $(pbpaste)"
+}
+
+savealias() {
+  source ~/.my_aliases
+  THE_ALIAS=$(alias $1)
+  if [[ -z "${THE_ALIAS}" ]]; then
+    echo "Alias $1 not defined. [${THE_ALIAS}][$(${THE_ALIAS})]"
+    return 1
+  else
+    echo "Alias $1 defined. [${THE_ALIAS}][$(${THE_ALIAS})]"
+    echo "${THE_ALIAS}" >> ~/.my_aliases
+    source ~/.my_aliases
+  fi
+}
+

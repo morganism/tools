@@ -1,3 +1,6 @@
+COLOURS_FILE="/Users/morgan/.ansi_colours.env"
+[[ -f "$COLOURS_FILE" ]] && source "$COLOURS_FILE"
+
 alias dcud='docker compose up -d'
 alias ll='ls -liastr'
 alias ll2='ls -liastre@'
@@ -9,15 +12,18 @@ alias ipn='networksetup -listallhardwareports'  # shows interface names and MACs
 alias awsprofile='source ~/bin/_awsconsole'
 alias awssel='export AWS_PROFILE=$(cat ~/.config/aws/selected_profile)' 
 alias sbp='source ~/.bash_profile'
-alias vbp='vi ~/.bash_profile && command -v sbp &>/dev/null && sbp'
+alias vbp="vi ~/.bash_profile && echo -e \"\n\n ${IRed}Remember ${Red}source bash profile! ${White}sbp ${NC}\n\n\""
 alias vma='vi_my_aliases'
 alias vmf='vi_my_functions'
 alias smf='source ~/.my_functions'
 alias sma='source ~/.my_aliases'
 alias vbrc='vi ~/.bashrc && source ~/.bashrc'
-alias cds='cd ~ && pushd ~/src/morganism'
+alias cds='cd ~ && pushd ~/src/scalpelltd'
+alias cdm='cd ~ && pushd ~/src/morganism'
 alias tools='pushd ~/src/morganism/tools'
 alias ggu='git config --local --get remote.origin.url' # ggu == git get url : the url that you clone
 alias sudo='sudo '
 alias runvnc="vncserver -xstartup $HOME/bin/xstartup"
 #good tag
+alias werty='echo "werty"'
+alias ghowner='gh auth status|grep Logged|sed -e '\''s:^.*account ::'\'' -e '\''s: .*$::'\'''

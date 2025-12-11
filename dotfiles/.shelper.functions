@@ -1,0 +1,39 @@
+#!/bin/bash
+
+[[ -f ~/.ansi_colours.env ]] && source ~/.ansi_colours.env
+
+ts_rfc3339() {
+  # macOS warning: macOS date has no %N or nanoseconds. )
+  # Using EPOCHREALTIME means no dependency on BSD/GNU date → maximum portability. )
+  printf '%(%Y-%m-%dT%H:%M:%S)T.%09dZ\n' "$EPOCHSECONDS" "${EPOCHREALTIME#*.}"
+}
+ts() {
+  TS=$(ts_rfc3339)
+}
+
+info() {
+  ts
+  echo -e "${IBlack}[${IBlue}$TS${IBlack}]${Blue} $1${NC}"
+}
+
+error() {
+  ts
+  echo -e "${IBlack}[${IRed}$TS${IBlack}]${Red} $1${NC}"
+}
+
+ok() {
+  ts
+  echo -e "${IBlack}[${IGreen}$TS${IBlack}]${Green} $1${NC}"
+}
+
+warn() {
+  ts
+  echo -e "${IBlack}[${IYellow}$TS${IBlack}]${Yellow} $1${NC}"
+}
+
+alert() {
+  ts
+  echo -e "${IBlack}[${IYellow}$TS${IBlack}]${Yellow} $1${NC}"
+}
+
+
