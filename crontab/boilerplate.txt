@@ -1,0 +1,43 @@
+#=============================================================================
+# @author: morgan@morganism.dev
+# Sat Aug  3 04:55:33 UTC 2024
+# 
+# A handy crontab boilerplate :-)
+# 
+#=============================================================================
+# use /bin/sh to run commands, no matter what /etc/passwd says
+#      SHELL=/bin/sh
+#      # mail any output to `paul', no matter whose crontab this is
+#      MAILTO=paul
+#      #
+#      CRON_TZ=Japan
+#
+#      These special time specification "nicknames" which replace the 5
+#      initial time and date fields, and are prefixed with the '@'
+#      character, are supported:
+#
+#      @reboot    :    Run once after reboot.
+#      @yearly    :    Run once a year, ie.  "0 0 1 1 *".
+#      @annually  :    Run once a year, ie.  "0 0 1 1 *".
+#      @monthly   :    Run once a month, ie. "0 0 1 * *".
+#      @weekly    :    Run once a week, ie.  "0 0 * * 0".
+#      @daily     :    Run once a day, ie.   "0 0 * * *".
+#      @hourly    :    Run once an hour, ie. "0 * * * *".
+#
+#=============================================================================
+#
+#+-------------------------------------------- minute         0-59
+#|
+#|      +------------------------------------- hour           0-23
+#|      |
+#|      |       +----------------------------- day of month   1-31
+#|      |       |
+#|      |       |       +--------------------- month          1-12 (or names)
+#|      |       |       |
+#|      |       |       |       +------------- day of week    0-7 (0 or 7 is Sunday)
+#|      |       |       |       |                                  or use names
+#|      |       |       |       |
+#|      |       |       |       |       +----- COMMAND
+#|      |       |       |       |       |
+#|      |       |       |       |       |
+#V      V       V       V       V       V
