@@ -18,6 +18,9 @@
 
 ## Specific to RubyMotion:
 .dat*
+# Allow
+!.datetime*
+
 .repl_history
 build/
 *.bridgesupport

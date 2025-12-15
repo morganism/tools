@@ -1,0 +1,46 @@
+#!/bin/bash
+
+THIS="$(realpath $BASH_SOURCE)"
+DIR="$(dirname $THIS)"
+
+LIB_COLOURS="ansi_colours.env"
+LIB_DATETIME="datetime.functions"
+[[ -f "${DIR}/${LIB_COLOURS}" ]] && source "${DIR}/${LIB_COLOURS}"
+[[ -f "${DIR}/${LIB_DATETIME}" ]] && source "${DIR}/${LIB_DATETIME}"
+
+# -------------- TIMESTAMPS from LIB_DATETIME
+#ts_rfc3339
+#ts
+
+# ------------- COLOURS from LIB_COLOURS
+#Blue
+#IBlue
+#NC .. etc 
+
+# -------------- LOGGING
+info() {
+  ts_rfc3339
+  echo -e "${IBlack}[${IBlue}$TS:-ts${IBlack}]${Blue} $1${NC}"
+}
+
+error() {
+  ts_rfc3339
+  echo -e "${IBlack}[${IRed}$TS${IBlack}]${Red} $1${NC}"
+}
+
+ok() {
+  ts_rfc3339
+  echo -e "${IBlack}[${IGreen}$TS${IBlack}]${Green} $1${NC}"
+}
+
+warn() {
+  ts_rfc3339
+  echo -e "${IBlack}[${IYellow}$TS${IBlack}]${Yellow} $1${NC}"
+}
+
+alert() {
+  ts_rfc3339
+  echo -e "${IBlack}[${IYellow}$TS${IBlack}]${Yellow} $1${NC}"
+}
+
+
