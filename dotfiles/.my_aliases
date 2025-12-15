@@ -1,5 +1,8 @@
-COLOURS_FILE="/Users/morgan/.ansi_colours.env"
-[[ -f "$COLOURS_FILE" ]] && source "$COLOURS_FILE"
+THIS="$(realpath $BASH_SOURCE)"
+DIR="$(dirname $THIS)"
+
+LIB_COLOURS="ansi_colours.env"
+[[ -f "${DIR}/${LIB_COLOURS}" ]] && source "${DIR}/${LIB_COLOURS}"
 
 alias dcud='docker compose up -d'
 alias ll='ls -liastr'
