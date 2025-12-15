@@ -27,3 +27,8 @@ alias runvnc="vncserver -xstartup $HOME/bin/xstartup"
 #good tag
 alias werty='echo "werty"'
 alias ghowner='gh auth status|grep Logged|sed -e '\''s:^.*account ::'\'' -e '\''s: .*$::'\'''
+alias goaws='select_aws_profile.sh && awssel'
+# from deleted ~/.aws_aliases
+alias prod='source /Users/morgan/bin/_prodprofile'
+alias dev='source /Users/morgan/bin/_devprofile'
+

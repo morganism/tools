@@ -7,32 +7,34 @@ ts_rfc3339() {
   # Using EPOCHREALTIME means no dependency on BSD/GNU date → maximum portability. )
   printf '%(%Y-%m-%dT%H:%M:%S)T.%09dZ\n' "$EPOCHSECONDS" "${EPOCHREALTIME#*.}"
 }
+
 ts() {
   TS=$(ts_rfc3339)
+  echo $TS
 }
 
 info() {
-  ts
-  echo -e "${IBlack}[${IBlue}$TS${IBlack}]${Blue} $1${NC}"
+  ts_rfc3339
+  echo -e "${IBlack}[${IBlue}${TS:-ts${IBlack}]${Blue} $1${NC}"
 }
 
 error() {
-  ts
+  ts_rfc3339
   echo -e "${IBlack}[${IRed}$TS${IBlack}]${Red} $1${NC}"
 }
 
 ok() {
-  ts
+  ts_rfc3339
   echo -e "${IBlack}[${IGreen}$TS${IBlack}]${Green} $1${NC}"
 }
 
 warn() {
-  ts
+  ts_rfc3339
   echo -e "${IBlack}[${IYellow}$TS${IBlack}]${Yellow} $1${NC}"
 }
 
 alert() {
-  ts
+  ts_rfc3339
   echo -e "${IBlack}[${IYellow}$TS${IBlack}]${Yellow} $1${NC}"
 }
 
