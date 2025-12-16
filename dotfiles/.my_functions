@@ -1,7 +1,7 @@
 THIS="$(realpath $BASH_SOURCE)"
 DIR="$(dirname $THIS)"
 
-LIB_COLOURS="ansi_colours.env"
+LIB_COLOURS=".ansi_colours.env"
 [[ -f "${DIR}/${LIB_COLOURS}" ]] && source "${DIR}/${LIB_COLOURS}"
 
 # --------------------
