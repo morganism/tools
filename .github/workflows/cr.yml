@@ -17,19 +17,18 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-          # --- OpenAI configuration ---
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           OPENAI_API_ENDPOINT: https://api.openai.com/v1
           MODEL: gpt-4o
 
-          # --- Review behaviour ---
           LANGUAGE: Chinese
           PROMPT: "Please check the following code diff for bugs, security issues, and bad practices."
 
-          temperature: 1
-          top_p: 1
-          max_tokens: 10000
+          temperature: "1"
+          top_p: "1"
+          max_tokens: "10000"
 
-          MAX_PATCH_LENGTH: 10000
-          IGNORE_PATTERNS: /node_modules/**/*,*.md
-          INCLUDE_PATTERNS: *.js,*.ts
+          MAX_PATCH_LENGTH: "10000"
+          IGNORE_PATTERNS: "/node_modules/**/*,*.md"
+          INCLUDE_PATTERNS: "*.js,*.ts"
+
