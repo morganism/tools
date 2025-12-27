@@ -201,3 +201,50 @@ On_IBlue='\033[0;104m'    # Blue                  #COLOUR #ANSI
 On_IPurple='\033[10;95m'  # Purple                #COLOUR #ANSI
 On_ICyan='\033[0;106m'    # Cyan                  #COLOUR #ANSI
 On_IWhite='\033[0;107m'   # White                 #COLOUR #ANSI
+
+cursor_up() {
+  # echo -e "$(cursor_up 6)"
+  printf '\033[%dA;' "$1"
+}
+cursor_down() {
+  # echo -e "$(cursor_down 6)"
+  printf '\033[%dB;' "$1"
+}
+cursor_right() {
+  # echo -e "$(cursor_right 6)"
+  printf '\033[%dC;' "$1"
+}
+cursor_left() {
+  # echo -e "$(cursor_left 6)"
+  printf '\033[%dD;' "$1"
+}
+cursor_move() {
+  # echo -e "$(cursor_move 6 2)" # move to Line 6, Column 2
+  echo -e "\033[<L>;<C>H" # move to Line L, Column C 
+}
+cursor_save() {
+  echo -e "\033[s" # Save current cursor position (row/col).
+}
+cursor_restore() {
+  echo -e "\033[u" # Restore cursor position (row/col).
+}
+
+: <<DOCXX
+Cursor_Up_19='\033[<19>A;'
+Common Cursor Movement Codes
+\033[<L>;<C>H or \033[<L>;<C>f: Move to line L, column C (e.g., \033[1;1H for top-left).
+\033[<N>A: Move cursor Up N lines (default 1).
+\033[<N>B: Move cursor Down N lines (default 1).
+\033[<N>C: Move cursor Right N columns (default 1).
+\033[<N>D: Move cursor Left N columns (default 1).
+\r (Carriage Return): Move to the beginning of the current line.
+\033[<N>E: Move to the start of the line N lines down (default 1).
+\033[<N>F: Move to the start of the line N lines up (default 1).
+\033[<N>G: Move to column N on the current line. 
+Save/Restore Position
+\033[s: Save current cursor position (row/col).
+\033[u: Restore saved cursor position (Note: some older systems/implementations might only restore horizontal position). 
+Clearing Screen/Lines
+\033[2J: Clear the entire screen, move cursor to (0,0).
+\033[K: Erase from cursor to end of line. 
+DOCXX
