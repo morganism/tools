@@ -1,6 +1,14 @@
 #!/usr/bin/env bash
+: <<DOCXX
+________________________________________________________________________________
+Usage   : $0 OPTIONS
+        :
+Desc    : Things what I do
+Author  : @author
+Date    : @date 
+________________________________________________________________________________
+DOCXX
 
-source ~/.bin/.functions
 [[ -f .ansi.colours ]] && source .ansi.colours
 
 echo -e "${Blue}N.B. ${White}vi${Blue} is aliased to ${IBlue}${0}${NC}"
@@ -10,6 +18,12 @@ sleep 1
 usage() {
     echo "Missing filename.\nUsage: $(basename $0) [-b] file"
     echo "  where -b FILE .. Create FILE in $HOME/bin"
+}
+
+dash() {
+  # return some '-' chars (default 80)
+  n=${1:-80} # how many?
+  head -c $n < /dev/zero | tr '\0' '\101'
 }
 
 create_or_edit() {
