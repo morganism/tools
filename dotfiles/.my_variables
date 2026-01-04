@@ -1,0 +1,2 @@
+MASTER="master"
+defaultBranch=$(git config --get init.defaultBranch || echo $MASTER)

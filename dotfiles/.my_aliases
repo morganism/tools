@@ -34,4 +34,8 @@ alias goaws='select_aws_profile.sh && awssel'
 # from deleted ~/.aws_aliases
 alias prod='source /Users/morgan/bin/_prodprofile'
 alias dev='source /Users/morgan/bin/_devprofile'
-
+alias downl='pushd ~/Downloads'
+alias gita='git add'
+alias gitc='git commit'
+alias gitcm='git commit -m '
+alias gitp='git push'
