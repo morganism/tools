@@ -41,6 +41,7 @@ create_or_edit() {
     RP=$(realpath $1)
     echo "realpath to '$1' is: $RP"    
 
+    SNIPPETS="~/.my_snippets"
     if [[ ! -e $1 ]]; then
       echo '#!/usr/bin/env bash' >> $1
       echo ": <<DOCXX"           >> $1
