@@ -204,19 +204,19 @@ On_IWhite='\033[0;107m'   # White                 #COLOUR #ANSI
 
 cursor_up() {
   # echo -e "$(cursor_up 6)"
-  printf '\033[%dA;' "$1"
+  printf '\033[%dA' "$1"
 }
 cursor_down() {
   # echo -e "$(cursor_down 6)"
-  printf '\033[%dB;' "$1"
+  printf '\033[%dB' "$1"
 }
 cursor_right() {
   # echo -e "$(cursor_right 6)"
-  printf '\033[%dC;' "$1"
+  printf '\033[%dC' "$1"
 }
 cursor_left() {
   # echo -e "$(cursor_left 6)"
-  printf '\033[%dD;' "$1"
+  printf '\033[%dD' "$1"
 }
 cursor_move() {
   # echo -e "$(cursor_move 6 2)" # move to Line 6, Column 2
@@ -228,6 +228,50 @@ cursor_save() {
 cursor_restore() {
   echo -e "\033[u" # Restore cursor position (row/col).
 }
+clear_to_eol() {
+  echo -e "$\033[K"
+}
+clear_screen() {
+  echo -e "$\033[2j" 
+}
+hide_cursor() {
+  echo -e "\033[?25l"
+}
+show_cursor() {
+  echo -e "\033[?25h" # mnemonic 'h' for show 'l' for hide .. errr
+}
+save_position() {
+  echo -e "\033[s"
+}
+restore_position() {
+  echo -e "\033[u"
+}
+altscr() {
+cat ~/.SCR
+  echo -n "\033[?1049h" > ~/.SCR
+cat ~/.SCR
+  printf "\033[?1049h" # Enter alternate screen
+}
+
+scr() {
+cat ~/.SCR
+  echo -n "\033[?1049l" > ~/.SCR
+cat ~/.SCR
+  printf "\033[?1049l" # Enter main screen
+}
+toggle-scr() {
+  SCR=$(cat ~/.SCR)
+  echo -e "${Blue}SCREEN is ${SCR}${Reset}"
+  if [[ "${SCR}" = "\033[?1049h" ]]; then
+    echo "h"
+    scr
+  else
+    echo "l"
+    altscr
+  fi
+}
+
+  
 
 : <<DOCXX
 Cursor_Up_19='\033[<19>A;'
@@ -247,4 +291,9 @@ Save/Restore Position
 Clearing Screen/Lines
 \033[2J: Clear the entire screen, move cursor to (0,0).
 \033[K: Erase from cursor to end of line. 
+
+# Start an app in the alternate screen buffer (clears, runs app, restores)
+printf "\033[?1049h" # Enter alternate screen
+# Your app runs here...
+printf "\033[?1049l"
 DOCXX

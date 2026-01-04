@@ -1,0 +1,151 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require "json"
+require "yaml"
+
+module Ini2Json
+  Section = Struct.new(:name, :subsection, :entries, keyword_init: true) do
+    def to_h
+      entries.transform_keys(&:to_s)
+    end
+  end
+
+  class Parser
+    SECTION = /^\[(\w+)(?:\s+"([^"]+)")?\]$/
+    KV      = /^([\w\-.]+)\s*=\s*(.+)$/
+
+    def initialize(io)
+      @io = io
+      @sections = []
+    end
+
+    def parse
+      current = nil
+
+      @io.each_line do |raw|
+        line = raw.strip
+        next if line.empty? || line.start_with?("#", ";")
+
+        case line
+        when SECTION
+          current = Section.new(name: $1, subsection: $2, entries: {})
+          @sections << current
+        when KV
+          raise ArgumentError, "Key-value outside section: #{line}" unless current
+          current.entries[$1.to_sym] = coerce($2)
+        end
+      end
+
+      self
+    end
+
+    def to_h
+      @sections.each_with_object({}) do |s, acc|
+        acc[s.name] ||= {}
+        target = s.subsection ? (acc[s.name][s.subsection] ||= {}) : acc[s.name]
+        target.merge!(s.to_h)
+      end
+    end
+
+    private
+
+    def coerce(v)
+      return true  if v == "true"
+      return false if v == "false"
+      return v.to_i if v =~ /^\d+$/
+      v
+    end
+  end
+
+  module Convert
+    module_function
+
+    def parse(io)
+      Parser.new(io).parse.to_h
+    end
+
+    def to_json(data, pretty: true)
+      pretty ? JSON.pretty_generate(data) : JSON.generate(data)
+    end
+
+    def to_yaml(data)
+      YAML.dump(data)
+    end
+  end
+end
+
+# -------------------------------------------------------
+# CLI ENTRYPOINT
+# -------------------------------------------------------
+
+if __FILE__ == $0
+  require "optparse"
+
+  options = {
+    out_dir: nil,
+    json: true,
+    yaml: false
+  }
+
+  OptionParser.new do |opts|
+    opts.banner = "Usage: ini2json [options] [file ...]"
+
+    opts.on("-oDIR", "--out-dir=DIR", "Output directory") do |dir|
+      options[:out_dir] = dir
+    end
+
+    opts.on("-y", "--yaml", "Enable YAML output") do
+      options[:yaml] = true
+    end
+
+    opts.on("-Y", "--yaml", "Diable YAML output") do
+      options[:yaml] = false  # DEFAULT
+    end
+
+    opts.on("-j", "Enable JSON output") do
+      options[:json] = true  # DEFAULT
+    end
+
+    opts.on("-J", "Disable JSON output") do
+      options[:json] = false
+    end
+  end.parse!
+
+  def die(msg)
+    warn "ini2json: #{msg}"
+    exit 1
+  end
+
+  def output_paths(input, out_dir)
+    base = File.basename(input, File.extname(input))
+    dir  = out_dir || File.dirname(input)
+
+    {
+      json: File.join(dir, "#{base}.json"),
+      yaml: File.join(dir, "#{base}.yaml")
+    }
+  end
+
+  def write_file(path, content)
+    die "refusing to overwrite #{path}" if File.exist?(path)
+    File.write(path, content)
+  end
+
+  if ARGV.empty? || ARGF.filename == "-"
+    data = Ini2Json::Convert.parse(ARGF)
+    puts Ini2Json::Convert.to_json(data) if options[:json]
+    puts Ini2Json::Convert.to_yaml(data) if options[:yaml]
+  else
+    ARGV.each do |filename|
+      File.open(filename) do |io|
+        data  = Ini2Json::Convert.parse(io)
+        paths = output_paths(filename, options[:out_dir])
+
+        write_file(paths[:json], Ini2Json::Convert.to_json(data)) if options[:json]
+        write_file(paths[:yaml], Ini2Json::Convert.to_yaml(data)) if options[:yaml]
+      end
+    end
+  end
+end
+

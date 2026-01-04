@@ -1,3 +1,30 @@
+ansi() {
+  [[ -f ~/.ansi.functions ]] && source ~/.ansi.functions
+}
+THIS_PATH() {
+  # return absolute path to the script where THIS_PATH is called from
+    realpath "${BASH_SOURCE[1]}"
+}
+THIS_DIR() {
+    dirname "$(realpath "${BASH_SOURCE[1]}")"
+}
+THIS_FILE() {
+    basename "$(realpath "${BASH_SOURCE[1]}")"
+}
+set_pgservice() { 
+    if [[ -z "$1" ]]; then
+        echo $0
+        exit 1
+    fi 
+    if [[ "$1" == "localdb" ]]; then
+        echo "localdb"
+        export PGSERVICE="localdb"
+    elif [[ "$1" == "aws_dev" ]]; then
+        echo "aws_dev"
+        export PGSERVICE="aws_dev"
+    fi
+    echo "PGSERVICE=$PGSERVICE"
+}
 THIS="$(realpath $BASH_SOURCE)"
 DIR="$(dirname $THIS)"
 
@@ -145,4 +172,44 @@ savealias() {
     source ~/.my_aliases
   fi
 }
-
+colours() {
+  [[ -f ~/.ansi.functions ]] && source ~/.ansi.functions && echo -en "${fGreen}OK${Reset}" || echo -en "${\033[31m}ERROR loading ~/.ansi.functions${Reset}"
+  sleep 0.8
+  echo -en "$(cursor_left 2)${clear_to_eol}$(cursor_left 2)${clear_to_eol}"
+}
+fade() {
+  source ~/.ansi.functions
+  R=$1
+  G=$2
+  B=$3
+  M=$4
+  
+  echo -en "\033[38;2;${R};${G};${B}m${M}${Reset}"
+}
+claude_github_wf() {
+  REPO="$1"
+  DIR=".github/workflows/claude.yml"
+}
+#check and recover from the vi emacs keymap shite
+bindv() {
+  ansi
+  bind -v | tail -7 | sed -e 's:\([@+:]\):\1      «««:'
+  NEED_RESET="$(bind -v | grep -c [@:+])"
+  if [[ "$NEED_RESET" = "0" ]]; then
+    echo -e "${Green}All's well here${Reset}"
+  else
+    echo -e "${Reset}${Yellow}Maybe we should run: ${iYellow}${uUnderline}bindreset${Reset}"
+  fi
+}
+  
+bindreset() {
+  ansi
+  echo -e "${Reset}${Yellow}Good idea to run me${Reset}"
+  echo -e "${IBlack}bind '${White}set ${bIWhite}emacs-mode-string${White} \"\"${rRegular}'${Reset}"
+  bind 'set emacs-mode-string ""'
+  echo -e "${IBlack}bind '${White}set ${bIWhite}vi-ins-mode-string${White} \"\"${rRegular}'${Reset}"
+  bind 'set vi-ins-mode-string ""'
+  echo -e "${IBlack}bind '${White}set ${bIWhite}vi-cmd-mode-string${White} \"\"${rRegular}'${Reset}"
+  bind 'set vi-cmd-mode-string ""'
+  echo -e "${Reset}${Green}all good now${Reset}"
+}
