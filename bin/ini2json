@@ -99,6 +99,14 @@ if __FILE__ == $0
       options[:yaml] = true
     end
 
+    opts.on("-Y", "--yaml", "Diable YAML output") do
+      options[:yaml] = false  # DEFAULT
+    end
+
+    opts.on("-j", "Enable JSON output") do
+      options[:json] = true  # DEFAULT
+    end
+
     opts.on("-J", "Disable JSON output") do
       options[:json] = false
     end
@@ -129,7 +137,7 @@ if __FILE__ == $0
     puts Ini2Json::Convert.to_json(data) if options[:json]
     puts Ini2Json::Convert.to_yaml(data) if options[:yaml]
   else
-    ARGF.each_file do |io|
+    ARGF.each do |io|
       input = io.path
       data  = Ini2Json::Convert.parse(io)
       paths = output_paths(input, options[:out_dir])
