@@ -132,18 +132,19 @@ if __FILE__ == $0
     File.write(path, content)
   end
 
-  if ARGF.filename == "-"
+  if ARGV.empty? || ARGF.filename == "-"
     data = Ini2Json::Convert.parse(ARGF)
     puts Ini2Json::Convert.to_json(data) if options[:json]
     puts Ini2Json::Convert.to_yaml(data) if options[:yaml]
   else
-    ARGF.each do |io|
-      input = io.path
-      data  = Ini2Json::Convert.parse(io)
-      paths = output_paths(input, options[:out_dir])
+    ARGV.each do |filename|
+      File.open(filename) do |io|
+        data  = Ini2Json::Convert.parse(io)
+        paths = output_paths(filename, options[:out_dir])
 
-      write_file(paths[:json], Ini2Json::Convert.to_json(data)) if options[:json]
-      write_file(paths[:yaml], Ini2Json::Convert.to_yaml(data)) if options[:yaml]
+        write_file(paths[:json], Ini2Json::Convert.to_json(data)) if options[:json]
+        write_file(paths[:yaml], Ini2Json::Convert.to_yaml(data)) if options[:yaml]
+      end
     end
   end
 end
