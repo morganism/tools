@@ -46,6 +46,9 @@ elif [[ "$URL" =~ ^git ]]; then
 elif [[ "$URL" =~ ^http ]]; then
   # good URL so far
   echo "Cloning $URL - https"
+elif [[ "$URL" =~ .git$ ]]; then
+  # OWNER/REPO.git 
+  echo "good"
 else
   # URL format error
   usage "URL format error, should begin with 'https' or 'git' and end with '.git'"
@@ -54,12 +57,22 @@ fi
 # URL looks like this
 # https://github.com/owner/repo.git
 # git@github.com:owner/repo.git
+# owner/repo.git                     «« or maybe
+
 
 # funky way to set $OWNER and $REPO
-OWNER_SEMI_REPO=$(echo $URL | sed -e 's|^.*github.com.|OWNER="|' -e 's|/|";REPO="|' -e 's|$|"|')
+OWNER_SEMI_REPO=$URL
+OWNER_SEMI_REPO=$(echo $OWNER_SEMI_REPO | sed -e 's|^.*github.com.||' -e 's|/|";REPO="|' -e 's|$|"|')
+OWNER_SEMI_REPO=$(echo $OWNER_SEMI_REPO | sed -e 's|^|OWNER="|')
+echo "OWNER_SEMI_REPO =[$OWNER_SEMI_REPO]"
+OWNER_SEMI_REPO=$(echo $OWNER_SEMI_REPO | sed -e 's:\.git::')
+echo "OWNER_SEMI_REPO =[$OWNER_SEMI_REPO]"
+
+
 eval $OWNER_SEMI_REPO
 echo "."
-
+echo "OWNER=$OWNER"
+echo "REPO=$REPO"
 DIR=~/src/$OWNER
 if [[ ! -d $DIR ]]; then
   echo "Creating OWNER ($OWNER) Directory : $DIR"

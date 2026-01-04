@@ -15,32 +15,44 @@ LIB_DATETIME=".datetime.functions"
 # ------------- COLOURS from LIB_COLOURS
 #Blue
 #IBlue
-#NC .. etc 
+#Reset .. etc 
+
+# DEFAULT=logger : Use what is here
+#       : inline : Pass in your own format
+MODE="logging" # use functions as-is
+logging.mode() {
+  if [[ -z "$1" ]]; then
+    echo "$MODE"
+  else
+    MODE=$1
+  fi
+}
+
 
 # -------------- LOGGING
 info() {
   ts_rfc3339
-  echo -e "${IBlack}[${IBlue}$TS:-ts${IBlack}]${Blue} $1${NC}"
+  echo -e "${IBlack}[${IBlue}$TS${IBlack}]${Blue} $1${Reset}"
 }
 
 error() {
   ts_rfc3339
-  echo -e "${IBlack}[${IRed}$TS${IBlack}]${Red} $1${NC}"
+  echo -e "${IBlack}[${IRed}$TS${IBlack}]${Red} $1${Reset}"
 }
 
 ok() {
   ts_rfc3339
-  echo -e "${IBlack}[${IGreen}$TS${IBlack}]${Green} $1${NC}"
+  echo -e "${IBlack}[${IGreen}$TS${IBlack}]${Green} $1${Reset}"
 }
 
 warn() {
   ts_rfc3339
-  echo -e "${IBlack}[${IYellow}$TS${IBlack}]${Yellow} $1${NC}"
+  echo -e "${IBlack}[${IYellow}$TS${IBlack}]${Yellow} $1${Reset}"
 }
 
 alert() {
   ts_rfc3339
-  echo -e "${IBlack}[${IYellow}$TS${IBlack}]${Yellow} $1${NC}"
+  echo -e "${IBlack}[${IYellow}$TS${IBlack}]${Yellow} $1${Reset}"
 }
 
 
