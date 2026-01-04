@@ -5,6 +5,10 @@
 [![Code Review](https://github.com/morganism/tools/actions/workflows/cr.yml/badge.svg)](https://github.com/morganism/tools/actions/workflows/cr.yml)
 [![Claude Code](https://github.com/morganism/tools/actions/workflows/claude.yml/badge.svg)](https://github.com/morganism/tools/actions/workflows/claude.yml)
 
+## README.md
+
+Check oput the [Wiki](https://github.com/morganism/tools/wiki) !
+
 
 ## Tooling, scripts, utils 
 
