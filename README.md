@@ -7,7 +7,7 @@
 
 ## README.md
 
-Check oput the [Wiki](https://github.com/morganism/tools/wiki) !
+Check out the [Wiki](https://github.com/morganism/tools/wiki) !
 
 
 ## Tooling, scripts, utils 
