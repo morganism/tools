@@ -1,0 +1,64 @@
+#!/usr/bin/env bash
+: <<DOCXX
+A wrapper around terminal-notifier
+Installation: brew install terminal-notifier
+Author: morgan@morganism.dev
+Date: Sun 28 Dec 2025 15:06:13 GMT
+DOCXX
+
+[[ -f ~/.ansi.functions ]] && source ~/.ansi.functions
+
+set -euo pipefail
+
+BIN="/opt/homebrew/bin/terminal-notifier"
+
+if [[ ! -x "$BIN" ]]; then
+  echo -e "${uRed}terminal-notifier${Red} not found at ${IRed}$BIN${Reset}" >&2
+  echo -e "${iWhite}Installation:${Reset} ${uWhite}brew install terminal-notifier${Reset}"
+  exit 127
+fi
+
+usage() {
+  cat >&2 <<EOF
+Usage:
+  tnotify --error   "message"
+  tnotify --warn    "message"
+  tnotify --info    "message"
+  tnotify --success "message"
+EOF
+  exit 2
+}
+
+[[ $# -lt 2 ]] && usage
+
+level="$1"
+shift
+msg="$*"
+
+case "$level" in
+  --error)
+    title="Error: ❗️"
+    sound="Basso"
+    ;;
+  --warn)
+    title="Warning: ⚠️"
+    sound="Funk"
+    ;;
+  --info)
+    title="Info: ℹ️"
+    sound="Glass"
+    ;;
+  --success)
+    title="Success: ✅"
+    sound="Hero"
+    ;;
+  *)
+    usage
+    ;;
+esac
+
+"$BIN" \
+  -title "$title" \
+  -message "$msg" \
+  -sound "$sound"
+

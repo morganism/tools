@@ -2,3 +2,6 @@
 # echo a colourful Hello World
 [[ -f ~/.ansi.functions ]] && source ~/.ansi.functions
 echo -e "${uIRed}H${NC}${dIGreen}e${NC}${bIBlue}l${NC}${RIYellow}${Cyan}l${NC}${iIBlack}${OnWhite}o${NC} ${fWhite}${OnBlack}W${NC}${uPurple}${iItalic}o${NC}${rReverse}r${NC}${dWhite}${OnBlack}l${NC}${blue}d${NC}"
+echo -e "${NC}"
+sleep 5
+reset
