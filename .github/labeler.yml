@@ -1,3 +1,21 @@
+Pages:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'docs/**'
+          - '**/*.md'
+
 Documentation:
-- changed-files:
-  - any-glob-to-any-file: '**/*'
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'docs/**'
+          - '**/*.md'
+
+bug:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'src/**'
+
+feature:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'feature/**'
