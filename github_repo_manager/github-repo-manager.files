@@ -1,0 +1,8 @@
+./examples.rb
+./install.sh
+./QUICKSTART.md
+./README.md
+./github-repo-manager
+./lib/github_repo_manager.rb
+./Gemfile
+./github-repo-manager.files
