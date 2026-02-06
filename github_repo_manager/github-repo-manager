@@ -1,0 +1,28 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require 'bundler/inline'
+
+gemfile do
+  source 'https://rubygems.org'
+  gem 'octokit', '~> 8.0'
+  gem 'tty-prompt', '~> 0.23'
+  gem 'tty-table', '~> 0.12'
+  gem 'tty-spinner', '~> 0.9'
+  gem 'pastel', '~> 0.8'
+  gem 'dotenv', '~> 3.0'
+end
+
+require_relative 'lib/github_repo_manager'
+
+begin
+  manager = GitHubRepoManager.new
+  manager.run
+rescue Interrupt
+  puts "\n\n#{Pastel.new.red('Interrupted by user. Exiting...')}"
+  exit 130
+rescue StandardError => e
+  puts Pastel.new.red("\nError: #{e.message}")
+  puts e.backtrace.first(5).join("\n") if ENV['DEBUG']
+  exit 1
+end
