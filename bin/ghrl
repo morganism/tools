@@ -4,6 +4,8 @@
 # with json out
 # verbose out
 
+GITHUB_TOKEN="$(cat ~/tokens/GH_SCALPEL_MAC)"
+
 FIELDS="url,name"
 JSON=""
 for i in $(seq 1 $#)

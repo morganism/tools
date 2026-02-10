@@ -1,0 +1,23 @@
+#!/usr/bin/env ruby
+
+last_content = `pbpaste`.strip
+puts "Monitoring clipboard... (Ctrl-C to stop)"
+puts "Initial content: #{last_content[0..50]}..."
+
+loop do
+  current = `pbpaste`.strip
+  if current != last_content
+    timestamp = Time.now.strftime("%H:%M:%S")
+    puts "\n[#{timestamp}] CLIPBOARD CHANGED!"
+    puts "Old: #{last_content[0..100]}"
+    puts "New: #{current[0..100]}"
+    
+    # Try to figure out what changed it
+    processes = `ps aux`.lines.select { |line| line.match?(/ruby|python|bash|sh|osascript/) }
+    puts "\nSuspicious processes:"
+    puts processes.join
+    
+    last_content = current
+  end
+  sleep 0.5
+end

@@ -1,0 +1,174 @@
+###############################################################################
+#
+# include
+#
+# Use this instead of 'source' to provide sane sourcing
+#
+# Design contract (non-negotiable)
+#
+# Included files must be declarative only:
+#   - function definitions
+#   - variable assignments
+#   - aliases
+#
+# Forbidden inside included files:
+#   - cd
+#   - exit
+#   - exec
+#   - return (outside functions)
+#   - set -e, set +e, set -o
+#   - sourcing files via absolute paths
+#   - running commands for “initialisation”
+#
+# Rationale:
+# Shell is executable text, not a module system. This include mechanism enforces
+# a discipline that approximates purity: configuration describes state, it does
+# not perform actions. Side effects during include lead to unpredictable load
+# order, directory corruption, and debugging misery.
+#
+# This implementation:
+#   - Resolves include paths relative to the caller
+#   - Preserves the caller’s working directory
+#   - Supports nested includes
+#   - Logs a dependency graph
+#   - Refuses files with obvious side effects
+#   - Supports POSIX-ish fallback via INCLUDE_POSIXISH=true
+#   - Adapts behaviour based on detected shell
+###############################################################################
+
+# ---------------------------------------------------------------------------
+# Global state
+# ---------------------------------------------------------------------------
+
+: "${INCLUDE_POSIXISH:=false}"
+
+# dependency graph: "parent -> child"
+__INCLUDE_GRAPH=()
+
+# guard against double inclusion (bash/zsh only)
+if [ -n "$BASH_VERSION" ] || [ -n "$ZSH_VERSION" ]; then
+  declare -A __INCLUDED
+fi
+
+# ---------------------------------------------------------------------------
+# Shell detection
+# ---------------------------------------------------------------------------
+
+__detect_shell() {
+  if [ -n "$BASH_VERSION" ]; then
+    printf '%s\n' bash
+  elif [ -n "$ZSH_VERSION" ]; then
+    printf '%s\n' zsh
+  else
+    printf '%s\n' sh
+  fi
+}
+
+# ---------------------------------------------------------------------------
+# Dependency logging
+# ---------------------------------------------------------------------------
+
+__log_dep() {
+  __INCLUDE_GRAPH+=("$1 -> $2")
+}
+
+# ---------------------------------------------------------------------------
+# Side-effect detection (heuristic, explicit, unapologetic)
+# ---------------------------------------------------------------------------
+
+__check_side_effects() {
+  # Fast, dumb, and honest. If you hide sins from this check, that’s on you.
+  grep -En '^[[:space:]]*(cd|exit|exec|return|set[[:space:]]+-|source[[:space:]]+/)' "$1" \
+    >/dev/null && return 1
+  return 0
+}
+
+# ---------------------------------------------------------------------------
+# POSIX-ish include (minimal, no arrays, no caller introspection)
+# ---------------------------------------------------------------------------
+
+__include_posix() {
+  file="$1"
+
+  [ -r "$file" ] || {
+    printf 'include failed: %s not found or unreadable\n' "$file" >&2
+    exit 1
+  }
+
+  __check_side_effects "$file" || {
+    printf 'include refused (side effects): %s\n' "$file" >&2
+    exit 1
+  }
+
+  . "$file"
+}
+
+# ---------------------------------------------------------------------------
+# Bash / Zsh include (path-stable, dependency-logged, idempotent)
+# ---------------------------------------------------------------------------
+
+__include_native() {
+  local file caller dir target
+
+  file="$1"
+
+  if [ -n "$BASH_VERSION" ]; then
+    caller="${BASH_SOURCE[1]}"
+  else
+    caller="${(%):-%N}"
+  fi
+
+  dir="$(cd "$(dirname "$caller")" && pwd)"
+  target="$dir/$file"
+
+  __log_dep "$caller" "$target"
+
+  [ -r "$target" ] || {
+    printf 'include failed: %s\n' "$target" >&2
+    exit 1
+  }
+
+  if [ -n "$BASH_VERSION" ] || [ -n "$ZSH_VERSION" ]; then
+    [ "${__INCLUDED["$target"]}" ] && return
+    __INCLUDED["$target"]=1
+  fi
+
+  __check_side_effects "$target" || {
+    printf 'include refused (side effects): %s\n' "$target" >&2
+    exit 1
+  }
+
+  (
+    cd "$dir" || exit 1
+    source "$target"
+  )
+}
+
+# ---------------------------------------------------------------------------
+# Public include API
+# ---------------------------------------------------------------------------
+
+include() {
+  if [ "$INCLUDE_POSIXISH" = true ]; then
+    __include_posix "$1"
+    return
+  fi
+
+  case "$(__detect_shell)" in
+    bash|zsh)
+      __include_native "$1"
+      ;;
+    *)
+      __include_posix "$1"
+      ;;
+  esac
+}
+
+# ---------------------------------------------------------------------------
+# Dependency graph inspection
+# ---------------------------------------------------------------------------
+
+include_graph() {
+  printf '%s\n' "${__INCLUDE_GRAPH[@]}"
+}
+

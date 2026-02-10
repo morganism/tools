@@ -39,3 +39,18 @@ alias gita='git add'
 alias gitc='git commit'
 alias gitcm='git commit -m '
 alias gitp='git push'
+alias kaopen='killall SwiftBar && open -a SwiftBar'
+alias jekyll='/usr/local/lib/ruby/gems/4.0.0/gems/jekyll-4.4.1/exe/jekyll '
+alias ghpages='/usr/local/lib/ruby/gems/4.0.0/gems/github-pages-223/bin/github-pages '
+alias webserver='python -m http.server 8000'
+alias csd=check_source_date
+# date and time
+alias dmy='$(echo "date +%d%m%y")'
+alias dmY='$(echo "date +%d%m%Y")'
+alias dmy-='$(echo "date +%d-%m-%y")'
+alias dmY-='$(echo "date +%d-%m-%Y")'
+alias hms='$(echo "date +%H%M%S")'
+alias HMS='$(echo "date +%H%M%S")'
+alias hms:='$(echo "date +%H:%M:%S")'
+alias HMS:='$(echo "date +%H:%M:%S")'
+

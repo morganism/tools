@@ -1,0 +1,12 @@
+# SOUrce other dotfiles
+THIS_DIR=$(dirname $BASH_SOURCE)
+echo $THIS_DIR
+
+types="aliases functions prompt secrets snippets variables"
+
+for t in $TYPES
+do
+    # don't write to STDOUT .. if you need to debug
+    [[ -f "$THIS_DIR/.my_${t}" ]] && source "$THIS_DIR/.my_${t}" && echo -e "\U2705 OK ${t}" || echo -e "\U2757 NO ${t}"
+    [[ -f "$THIS_DIR/.my_${t}" ]] && source "$THIS_DIR/.my_${t}"
+done

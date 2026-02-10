@@ -219,8 +219,12 @@ cursor_left() {
   printf '\033[%dD' "$1"
 }
 cursor_move() {
-  # echo -e "$(cursor_move 6 2)" # move to Line 6, Column 2
-  echo -e "\033[<L>;<C>H" # move to Line L, Column C 
+  # "$(cursor_move 6 2)" # move to Line 6, Column 2
+  # "\033[<L>;<C>H" # move to Line L, Column C 
+  printf '\033[%d;%dH' "$1 $2"  # move to Line L, Column C 
+}
+cursor_to_column() {
+  printf  '\033[%dG' "$1" # move to column X this line
 }
 cursor_save() {
   echo -e "\033[s" # Save current cursor position (row/col).

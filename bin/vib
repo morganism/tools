@@ -9,15 +9,17 @@ Date    : @date
 ________________________________________________________________________________
 DOCXX
 
+{
+
+[[ -f ~/.my_functions ]] && source ~/.my_functions
 [[ -f .ansi.colours ]] && source .ansi.colours
 
-echo -e "${Blue}N.B. ${White}vi${Blue} is aliased to ${IBlue}${0}${NC}"
 echo -e "${Blue}here: ${IBlue}$(THIS_DIR)${NC}"
 sleep 1
 
 usage() {
-    echo "Missing filename.\nUsage: $(basename $0) [-b] file"
-    echo "  where -b FILE .. Create FILE in $HOME/bin"
+    echo -e "${Red}Missing filename.\n${White}Usage:${Blue} $(basename $0)${IWhite} [-b]${White} file${Reset}"
+    echo -e " ${White} where -b FILE .. Create FILE in${IWhite} $HOME${White}/bin${Reset}"
 }
 
 dash() {
@@ -28,8 +30,8 @@ dash() {
 
 create_or_edit() {
     if [[ -z "$1" ]]; then
-        echo "no FILE passed to create_or_edit function"
-        exit 3
+        echo -e "${Red}no FILE passed to ${IRed}create_or_edit${Red} function${Reset}"
+        return 3
     fi 
 
     if [[ -f "$HOME/.vib" ]]; then
@@ -38,18 +40,25 @@ create_or_edit() {
     if [[ -f ".vib" ]]; then
         source .vib   # source default settings file
     fi
-    RP=$(realpath $1)
-    echo "realpath to '$1' is: $RP"    
+
+    if [[ -f "$1" ]]; then
+      RP=$(realpath $1)
+      echo -e "${dWhite}realpath ${IWhite}$1${dWhite} is: ${RP}${Reset}"    
+    else
+      echo -e "${Green}${On_White}🆕${Reset}"
+    fi
 
     SNIPPETS="~/.my_snippets"
     if [[ ! -e $1 ]]; then
-      echo '#!/usr/bin/env bash' >> $1
-      echo ": <<DOCXX"           >> $1
-      echo "Add description"     >> $1
-      echo "Author: $AUTHOR"     >> $1
-      echo "Date: $(date)"       >> $1
-      echo "DOCXX"               >> $1
-      echo ""                    >> $1
+      echo '#!/usr/bin/env bash'                            >> $1
+      echo ": <<DOCXX"                                      >> $1
+      echo "Add description"                                >> $1
+      echo "Author: $AUTHOR"                                >> $1
+      echo "Date: $(date)"                                  >> $1
+      echo "DOCXX"                                          >> $1
+      echo ""                                               >> $1
+      echo "[[ -f .ansi.colours ]] && source .ansi.colours" >> $1
+      echo ""                                               >> $1
     fi
     touch                           $1
     chmod 755                       $1
@@ -59,34 +68,38 @@ create_or_edit() {
 
 if [[ -z $1 ]]; then
     usage
-    exit 1   
+    return 1   
 elif [[ $1 =~ ^-h ]]; then
     usage
-    exit 1
+    return 1
 elif [[ "$1" =~ ^-b ]]; then
     shift
 
     if [[ -z $1 ]]; then
-        echo "-b flag but no FILE ¿¿"
+        echo -e "${Red}-b flag but no FILE ¿¿${Reset}"
 
         usage
-        exit 2   
+        return 2   
     fi
-    echo "Creating new file in $HOME/bin/$1"
-    create_or_edit "$HOME/bin/$1"
+    ansi
+    FILE="$HOME/bin/$1"
+    echo -e "${dWhite}file is ${IWhite}${FILE}${Reset}"
+    create_or_edit "${FILE}"
 fi
 
 DIR="$HOME/bin"
 if [[ -f $DIR/$1 ]]; then
     create_or_edit "$DIR/$1" ;
-    exit
+    return 0
 else
     if [[ -f $1 ]]; then
         create_or_edit "$1" ;
-        exit
+        return 0
     else
-       echo "no bin no exist file so create"
+       echo -e "${dBlue}no bin no exist file so create${Reset}"
     fi
 fi
-echo $1
+echo -e "${Blue}${On_White}${1}${Reset}"
 create_or_edit $1
+
+}
