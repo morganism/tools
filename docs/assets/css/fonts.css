@@ -1,0 +1,8 @@
+@font-face {
+  font-family: bad_acid;
+  src: url(bad_acid.woff);
+}
+
+* {
+   font-family: bad_acid;
+}
