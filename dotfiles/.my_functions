@@ -1,6 +1,13 @@
 ansi() {
   [[ -f ~/.ansi.functions ]] && source ~/.ansi.functions
 }
+export MY_FUNCTIONS_SOURCE_DATE=$(date)
+check_source_date() {
+  ansi
+  echo -e "${White}0: ${uWhite}$MY_FUNCTIONS_SOURCE_DATE"
+  echo ""
+  echo -e "${White}1: ${uWhite}$(date)${Reset}"
+}
 THIS_PATH() {
   # return absolute path to the script where THIS_PATH is called from
     realpath "${BASH_SOURCE[1]}"
@@ -28,7 +35,7 @@ set_pgservice() {
 THIS="$(realpath $BASH_SOURCE)"
 DIR="$(dirname $THIS)"
 
-LIB_COLOURS=".ansi_colours.env"
+LIB_COLOURS="~/.ansi.functions"
 [[ -f "${DIR}/${LIB_COLOURS}" ]] && source "${DIR}/${LIB_COLOURS}"
 
 # --------------------
@@ -69,6 +76,7 @@ vi_my_functions() {
   #-----------
   #--- vmf ---
   #-----------
+  echo -e "${Red}${On_White}Function:${Reset} ${IBlue}${BASH_SOURCE}[vi_my_functions()]${Reset}"
   vi ~/.my_functions
   source ~/.my_functions
 }
@@ -212,4 +220,166 @@ bindreset() {
   echo -e "${IBlack}bind '${White}set ${bIWhite}vi-cmd-mode-string${White} \"\"${rRegular}'${Reset}"
   bind 'set vi-cmd-mode-string ""'
   echo -e "${Reset}${Green}all good now${Reset}"
+}
+
+
+#GIT_BRANCH=$(git branch -l | grep ^\* | sed -e 's:^\* ::')
+#git push --set-upstream origin SCALPEL_ORTUS
+#fatal: The current branch SCALPEL_ORTUS has no upstream branch.
+#To push the current branch and set the remote as upstream, use
+#
+#   git push --set-upstream origin SCALPEL_ORTUS
+#
+# wrap 'git push' to set upstream if necessary
+git() {
+  GIT_CMD="/usr/local/git/bin/git"
+  GIT_BRANCH=$($GIT_CMD branch -l | grep ^\* | sed -e 's:^\* ::')
+  if [[ $1 = "push" ]]; then
+    ansi
+    echo -e "${Blue}${On_White}wrap 'git push'${Reset}"
+    if  [[ $($GIT_CMD push 2>&1| grep 'has no upstream') ]]; then
+      echo $GIT_CMD push --set-upstream origin $GIT_BRANCH 
+      sleep 10
+      $GIT_CMD push --set-upstream origin $GIT_BRANCH 
+    fi
+  else
+    $GIT_CMD "$@"
+  fi
+}
+kv() {
+  secret=$1
+
+  # Extract the KEY and VALUE
+  KEY="${secret%%:*}"
+  VALUE="${secret##*:}"
+
+  # Print the results
+  echo "Key: $KEY"
+  echo "Value: $VALUE"
+}
+newrepo() {
+  ansi
+
+  usage() {
+    echo -e "${Blue}usage: ${IBlack}newrepo ${IBlack}<repo-name> [${IWhite}public|${White}private${IBlack}]${Reset}"
+    return 1
+  }
+  git_init_error() {
+    echo -e "${Red}Error calling: git init${Reset}"
+  }
+  git_commit_error() {
+    echo -e "${Red}Error calling: git commit${Reset}"
+  }
+
+  local REPO_NAME="$1"
+  local VISIBILITY="${2:-public}"
+
+  git init || git_init_error
+  git add .
+  git commit -m "initial commit" || git_commit_error
+
+  gh repo create "$REPO_NAME" \
+    --"$VISIBILITY" \
+    --source="." \
+    --remote="origin" \
+    --push
+}
+claude() {
+    # Pre-cleanup
+    printf '\e[?2004l\e[0m'
+    stty sane
+    
+    command claude "$@"
+    local exit_code=$?
+    
+    # Post-cleanup
+    printf '\e[?2004l\e[0m'
+    stty sane
+    
+    return $exit_code
+}
+genpasswd() {
+  ansi
+  [[ "${1}${2}" =~ -h ]] && echo -e "${dCyan}Usage: ${Cyan}genpasswd${Reset} ${IWhite}[-h]${Reset} ${IYellow}LENGTH${Reset}" && return 1
+  LEN=${1:-12}
+  ALPHANUM='A-Za-z0-9'
+  SYMBOLS='!@£$%^0-9'
+  PASSCHARS=$ALPHANUM
+  if [[ -z "${2:-$USE_SYMBOLS}" ]] || [[ "$USE_SYMBOLS" =~ [Yy] ]]; then
+    PASSCHARS+=$SYMBOLS
+  fi
+  export LC_ALL=C 
+  tr -dc $PASSCHARS < /dev/random | head -c $LEN | xargs | pbcopy && pbpaste
+}
+port() {
+  PORT=${1-1}
+  lsof -i :$PORT
+}
+
+command_not_found_handle () {
+  ansi
+  echo -e "${IRed}${On_White} ${BASH_SOURCE}[command_not_found_handle()]#[${BASH_LINENO}] invoked${Reset}"
+  #find / -type d -name '*bin*' -o -name '.*/bin'
+}
+where_am_i () {
+  ansi
+  echo -e "${IRed}${On_White} ${BASH_SOURCE}[where_am_i()]#[${BASH_LINENO[-2]}] invoked${Reset}"
+}
+
+ github-create() {
+ repo_name=$1
+
+ dir_name=`basename $(pwd)`
+
+ if [ "$repo_name" = "" ]; then
+ echo "Repo name (hit enter to use '$dir_name')?"
+ read repo_name
+ fi
+
+ if [ "$repo_name" = "" ]; then
+ repo_name=$dir_name
+ fi
+
+ username=`git config github.user`
+ if [ "$username" = "" ]; then
+ echo "Could not find username, run 'git config --global github.user <username>'"
+ invalid_credentials=1
+ fi
+
+ token=`git config github.token || $(echo $GITHUB_TOKEN)`
+ if [ "$token" = "" ]; then
+ echo "Could not find token, run 'git config --global github.token <token>'"
+ invalid_credentials=1
+ fi
+
+ if [ "$invalid_credentials" == "1" ]; then
+ return 1
+ fi
+
+ echo -n "Creating Github repository '$repo_name' ..."
+ curl -u "$username:$token" https://api.github.com/user/repos -d '{"name":"'$repo_name'"}' > /dev/null 2>&1
+ echo " done."
+
+ echo -n "Pushing local code to remote ..."
+ git remote add origin git@github.com:$username/$repo_name.git > /dev/null 2>&1
+ git push -u origin master > /dev/null 2>&1
+ echo " done."
+}
+function_definition() {
+  ansi
+  FUNCTION_NAME=$1
+  if [[ -z "$FUNCTION_NAME" ]]; then
+    echo -e "${Red}${On_White}ERROR!:${Reset} ${dWhite}}Usage:${Reset} ${IWhite}function_definition${Reset} ${White}<FUNCTION NAME>${Reset}"
+    return 127
+  fi
+
+  echo -e "${Red}"
+  echo -e "shopt -s extdebug; declare -F ${IWhite}$FUNCTION_NAME${Reset}"
+  (shopt -s extdebug; declare -F $FUNCTION_NAME)
+  echo -e "${Reset}"
+}
+≠() {
+  echo "≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠"
+  HHH=$(history | tail -3)
+  echo $HHH
 }
