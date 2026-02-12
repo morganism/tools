@@ -3,6 +3,6 @@
   src: url(../fonts/Badacid.woff);
 }
 
-h1 {
+* {
    font-family: bad_acid;
 }
