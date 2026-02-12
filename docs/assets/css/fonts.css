@@ -3,6 +3,6 @@
   src: url(assets/css/bad_acid.woff);
 }
 
-* {
+h1 {
    font-family: bad_acid;
 }
