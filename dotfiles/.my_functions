@@ -1,19 +1,5 @@
-# colour and cursor movement
 ansi() {
   [[ -f ~/.ansi.functions ]] && source ~/.ansi.functions
-}
-deprecated() {
-  ansi
-  echo -en "${Red}${On_Yellow}Deprecated${Reset} "
-  __SEE=$1
-
-  if [[ -n "${__SEE}" ]]; then
-    if [[ "$(type -t ${__SEE})" =~ function ]]; then
-      read __FNAME __FLINE __FFILE < <((shopt -s extdebug; declare -F ${__SEE})) 
-      echo -en " ${Blue}SEE${Black}: ${uCyan}${__FNAME}()${Reset} ${Blue}defined in${Reset} ${Purple}${__FFILE}${dWhite}(${White}${__FLINE}${dWhite})${Reset}."
-    fi
-  fi
-  echo -e "."
 }
 export MY_FUNCTIONS_SOURCE_DATE=$(date)
 check_source_date() {
@@ -256,14 +242,6 @@ git() {
       sleep 10
       $GIT_CMD push --set-upstream origin $GIT_BRANCH 
     fi
-  elif [[ $1 = "add" ]]; then
-    ansi
-    echo -e "${Green}Current branch is:${Reset} ${White}$GIT_BRANCH${Reset}"
-    if [[ "$GIT_BRANCH" =~ master ]]; then
-      echo "master"
-    else
-      echo "not"
-    fi
   else
     $GIT_CMD "$@"
   fi
@@ -331,7 +309,7 @@ genpasswd() {
     PASSCHARS+=$SYMBOLS
   fi
   export LC_ALL=C 
-  tr -dc $PASSCHARS < /dev/random | head -c $LEN | xargs
+  tr -dc $PASSCHARS < /dev/random | head -c $LEN | xargs | pbcopy && pbpaste
 }
 port() {
   PORT=${1-1}
@@ -348,7 +326,7 @@ where_am_i () {
   echo -e "${IRed}${On_White} ${BASH_SOURCE}[where_am_i()]#[${BASH_LINENO[-2]}] invoked${Reset}"
 }
 
-github-create() {
+ github-create() {
  repo_name=$1
 
  dir_name=`basename $(pwd)`
@@ -387,8 +365,21 @@ github-create() {
  git push -u origin master > /dev/null 2>&1
  echo " done."
 }
+function_definition() {
+  ansi
+  FUNCTION_NAME=$1
+  if [[ -z "$FUNCTION_NAME" ]]; then
+    echo -e "${Red}${On_White}ERROR!:${Reset} ${dWhite}}Usage:${Reset} ${IWhite}function_definition${Reset} ${White}<FUNCTION NAME>${Reset}"
+    return 127
+  fi
 
-function_definition() { 
-  deprecated fndef
-  fndef $1
+  echo -e "${Red}"
+  echo -e "shopt -s extdebug; declare -F ${IWhite}$FUNCTION_NAME${Reset}"
+  (shopt -s extdebug; declare -F $FUNCTION_NAME)
+  echo -e "${Reset}"
+}
+≠() {
+  echo "≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠≠"
+  HHH=$(history | tail -3)
+  echo $HHH
 }
