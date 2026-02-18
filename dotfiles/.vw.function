@@ -1,0 +1,65 @@
+# 'vi which' edit the file or function that implements the command
+vw() {
+  echo "$BASH_SOURCE"
+
+  Reset='\033[0m' # No Color
+  Black='\033[0;30m'; Red='\033[0;31m'; Green='\033[0;32m'; Yellow='\033[0;33m';
+  Blue='\033[0;34m'; Purple='\033[0;35m'; Cyan='\033[0;36m'; White='\033[0;37m';
+  dRed='\033[2;31m'; dWhite='\033[2;37m'; dGreen='\033[2;32m'; dBlue='\033[2;34m'; dCyan='\033[2;36m';
+  uCyan='\033[4;36m'; IRed='\033[0;91m'; IBlue='\033[0;94m'; IWhite='\033[0;97m';
+
+  fndef() {
+    echo "$BASH_SOURCE"
+    echo -e "${Reset}"
+    if [[ -z "$1" ]]; then
+      echo -e "${IRed}ERROR!${Reset} ${Red}Missing function name argument to 'fndef'${Reset}"
+      return 1
+    fi
+    read __FNAME __FLINE __FFILE < <((shopt -s extdebug; declare -F $1))
+    echo -e "${uCyan}${__FNAME}()${Blue} defined in ${Purple}${__FFILE}${dWhite}(${White}${__FLINE}${dWhite}). ${Reset}"
+    echo -e "."
+    __CODE=$(type -a $1|sed -e "s:\($1[^_A-Za-z0-9-]\):\\${Cyan}\1\\${Reset}:g" -e "s:\(/.*/\):\\${Purple}\1\\${Reset}:g" | head -10)
+    echo -e "${IBlue}${__CODE}${Reset}"
+  }
+
+  if [[ -z "$1" ]]; then
+    echo -e "${dRed}No command specified${Reset}"
+    echo -e "${Blue}Usage: ${uCyaan}vm${Reset} ${dWhite}<${White}COMMAND${dWhite}>${Reset}"
+    return 1
+  elif [[ "$1" =~ -h ]]; then
+    echo -e "${Blue}Usage: ${uCyaan}vm${Reset} ${dWhite}<${White}COMMAND${dWhite}>${Reset}"
+    return 1
+  else
+    COMMAND_TYPE="$(type -t $1)" # file, function 
+
+    case $COMMAND_TYPE in
+
+    alias)
+      echo -e "${IRed}${On_White}Alias!${Reset}"
+      ;;
+
+    file)
+      echo -e "type -t $1 is 'file' .. ${Green}OK${Reset}"
+      vi $(command -v $1) 
+      ;;
+
+    function)
+      fndef $1
+
+      read __FNAME __FLINE __FFILE < <((shopt -s extdebug; declare -F $1))
+
+      read -t5 -n1 -p "Edit ? [yn] " __RESPONSE
+      if [[ "${__RESPONSE}" =~ y ]]; then
+        echo -e "${dGreen}Skipping Edit${Reset}"
+      fi
+
+      vi +$__FLINE $__FFILE
+
+      ;;
+
+    *)
+      echo -e "${dCyan}No Match for ${IWhite}${COMMAND_TYPE}${Reset}"
+      ;;
+    esac
+  fi
+}
