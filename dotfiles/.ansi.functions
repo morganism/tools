@@ -1,3 +1,5 @@
+#  colours
+
 THIS="$(realpath $BASH_SOURCE)"
 DIR="$(dirname $THIS)"
  
