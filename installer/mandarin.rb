@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 #
-# installer.rb — standalone manifest-driven installer
+# mandarin.rb — standalone manifest-driven installer
 #
 # Reads any *.install.json produced by doc_generator.rb and performs
 # install, uninstall, check, or dry-run operations.
@@ -11,10 +11,10 @@
 # manifest file and it does the right thing.
 #
 # Usage:
-#   installer.rb --manifest tool.install.json --install
-#   installer.rb --manifest tool.install.json --install --dry-run
-#   installer.rb --manifest tool.install.json --uninstall
-#   installer.rb --manifest tool.install.json --check
+#   mandarin.rb --manifest tool.install.json --install
+#   mandarin.rb --manifest tool.install.json --install --dry-run
+#   mandarin.rb --manifest tool.install.json --uninstall
+#   mandarin.rb --manifest tool.install.json --check
 #
 # Requires: ruby 3.0+, stdlib only (fileutils, json, optparse — no gems required)
 
@@ -30,11 +30,16 @@ SCRIPT_NAME = File.basename($PROGRAM_NAME)
 # ---------------------------------------------------------------------------
 
 COLOUR = $stdout.tty?
-def ansi(code, str) = COLOUR ? "\e[#{code}m#{str}\e[0m" : str
-def ok(msg)    = puts "  #{ansi('32',  '✔')}  #{msg}"
-def warn_(msg) = puts "  #{ansi('33',  '⚠')}  #{msg}"   # warn_ avoids Kernel#warn
-def err(msg)   = puts "  #{ansi('31',  '✘')}  #{msg}"
-def info(msg)  = puts "  #{ansi('34',  '→')}  #{msg}"
+# 256-colour orange (#ff8c00 ≈ xterm 208) for that authentic citrus phosphor feel
+def ansi(code, str)  = COLOUR ? "\e[#{code}m#{str}\e[0m" : str
+def orange(str)      = ansi('38;5;208', str)
+def orange_hot(str)  = ansi('38;5;214', str)
+def orange_dim(str)  = ansi('38;5;130', str)
+
+def ok(msg)    = puts "  #{orange('🍊')}  #{msg}"
+def warn_(msg) = puts "  #{ansi('33', '⚠')}   #{msg}"   # warn_ avoids Kernel#warn
+def err(msg)   = puts "  #{ansi('31', '✘')}   #{msg}"
+def info(msg)  = puts "  #{orange('→')}   #{msg}"
 def dry(msg)   = puts "  #{ansi('36', '[DRY]')}  #{msg}"
 
 # ---------------------------------------------------------------------------
@@ -77,7 +82,7 @@ parser = OptionParser.new do |o|
   o.on('--sudo',    'Prefix shell commands with sudo')     { options[:sudo]    = true }
   o.on('--force',   'Overwrite existing files')            { options[:force]   = true }
   o.on('-v', '--verbose', 'Show each command as run')      { options[:verbose] = true }
-  o.on('-V', '--version') { puts "#{SCRIPT_NAME} v#{VERSION}"; exit }
+  o.on('-V', '--version') { puts "#{orange('🍊')}  mandarin v#{VERSION}  #{orange_dim('manifest · driven · installer')}"; exit }
   o.on('-h', '--help')    { puts o; exit }
 
   o.separator ''
@@ -492,7 +497,7 @@ def do_install(manifest, opts)
   end
 
   suffix = dry_run ? ansi('36', '✔  Dry-run complete. Nothing was written.') \
-                   : ansi('32', '✔  Installation complete.')
+                   : "#{orange('🍊')}  #{orange_hot('Installation complete.')}"
   puts "\n#{suffix}"
 end
 
@@ -554,7 +559,7 @@ def do_uninstall(manifest, opts)
   end
 
   suffix = dry_run ? ansi('36', '✔  Dry-run complete. Nothing was removed.') \
-                   : ansi('32', '✔  Uninstall complete.')
+                   : "#{orange('🍊')}  #{orange_hot('Uninstall complete.')}"
   puts "\n#{suffix}"
 end
 
@@ -585,7 +590,7 @@ def do_check(manifest, opts)
 
   puts ''
   if issues.empty?
-    puts ansi('32', '✔  All checks passed. Ready to install.')
+    puts "#{orange('🍊')}  #{orange_hot('All checks passed. Ready to install.')}"
     puts "    Run with --install to proceed, or --install --dry-run to preview."
   else
     puts ansi('33', "⚠  #{issues.size} issue(s) found — see above.")
