@@ -12,7 +12,7 @@
 #   - A self-contained installer       (<n>_install.rb)
 #
 # Requires: ANTHROPIC_API_KEY in environment
-# Deps:     net/http, json (both stdlib — no gems required)
+# # Deps:     net/http, json, optparse, fileutils, date (all stdlib — no gems required)
 
 require 'net/http'
 require 'json'
