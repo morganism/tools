@@ -7,7 +7,7 @@ HOME_BIN="$HOME/bin"         # the bin dir
 
 echo "linking bin files"
 cd bin
-for f in $(find . -type f | grep -v $0)
+for f in $(find . -type f -o -type l | grep -v $0)
 do
   FILE="$(realpath $f)"        # the file in git
   NAME="$(basename $f)"        # st the name 
@@ -22,7 +22,7 @@ done
 cd ..
 echo "linking dotfiles"
 cd dotfiles
-for f in $(find . -type f | grep -v $0)
+for f in $(find . -type f -o -type l | grep -v $0)
 do
   FILE="$(realpath $f)"
   NAME="$(basename $f)"
