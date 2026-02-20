@@ -39,3 +39,5 @@ alias gita='git add'
 alias gitc='git commit'
 alias gitcm='git commit -m '
 alias gitp='git push'
+alias dg='doc_generator'
+

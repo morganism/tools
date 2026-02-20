@@ -1,0 +1,55 @@
+{
+  "binary": {
+    "source": "doc_generator.rb",
+    "target": "doc_generator",
+    "destination": "/usr/local/bin",
+    "chmod": "0755"
+  },
+  "man_pages": [
+    {
+      "source": "doc_generator.1",
+      "section": "1",
+      "destination": "/usr/local/share/man/man1"
+    }
+  ],
+  "dependencies": {
+    "ruby_version": "3.0",
+    "gems": [],
+    "system_bins": [
+      {
+        "bin": "groff",
+        "package": "groff",
+        "optional": true
+      },
+      {
+        "bin": "mandb",
+        "package": "man-db",
+        "optional": true
+      }
+    ]
+  },
+  "environment": [
+    {
+      "var": "ANTHROPIC_API_KEY",
+      "required": true,
+      "description": "Anthropic API key for Claude model access",
+      "suggest_export": "export ANTHROPIC_API_KEY=sk-ant-your-key-here"
+    }
+  ],
+  "config_dirs": [],
+  "config_files": [],
+  "post_install_notes": [
+    "Ensure ANTHROPIC_API_KEY is exported in your shell profile (~/.bashrc, ~/.zshrc, etc.)",
+    "Run 'doc_generator --help' to verify the installation",
+    "If installed to a system prefix, you may need to run 'sudo mandb' to update the man page index"
+  ],
+  "uninstall_notes": [
+    "Remove the binary: rm /usr/local/bin/doc_generator",
+    "Remove the man page: rm /usr/local/share/man/man1/doc_generator.1",
+    "Optionally run 'mandb' to refresh the man page index",
+    "Your ANTHROPIC_API_KEY export in shell profiles must be removed manually if no longer needed"
+  ],
+  "name": "doc_generator",
+  "version": "2.0.0",
+  "author": "morgan"
+}
