@@ -2,26 +2,33 @@
 #
 # i make a symlink for each file in ./bin to $HOME/bin
 #
+[[ -f ~/.ansi.functions ]] && source ~/.ansi.functions
 
 HOME_BIN="$HOME/bin"         # the bin dir
+THIS=$(realpath $BASH_SOURCE)
+TOOLS_DIR=$(dirname $THIS)
 
-echo "linking bin files"
-cd bin
+cd $TOOLS_DIR
+
+echo -e "${IBlack}moving to correct directory: ${White}$TOOLS_DIR${Reset}"
+
+echo -e "${IBlack}linking bin files${Reset}"
+cd $TOOLS_DIR/bin
 for f in $(find . -type f -o -type l)
 do
   FILE="$(realpath $f)"        # the file in git
   NAME="$(basename $f)"        # st the name 
   TARGET="${HOME_BIN}/${NAME}" # the target 1
 
-  [[ -f "$TARGET" ]] && [[ $(file "$TARGET" | grep "$FILE") ]] && rm "$TARGET" && [[ "$?" = "0" ]] && echo "clean" 
+  [[ -f "$TARGET" ]] && [[ $(file "$TARGET" | grep "$FILE") ]] && rm "$TARGET" && [[ "$?" = "0" ]] && echo -e "${Green}clean${Reset}" 
 
   COMMAND="ln -sf $FILE $TARGET"
-  echo "${COMMAND}"
+  echo -e "${iWhite}${COMMAND}${Reset}"
   $COMMAND
 done
 cd ..
-echo "linking dotfiles"
-cd dotfiles
+echo -e "${IBlack}linking dotfiles${Reset}"
+cd $TOOLS_DIR/dotfiles
 for f in $(find . -type f -o -type l | grep -v $0)
 do
   FILE="$(realpath $f)"
@@ -33,7 +40,7 @@ do
     fi
 
     COMMAND="ln -sf $FILE $HOME/$NAME"
-    echo "${COMMAND}"
+    echo -e "${iWhite}${COMMAND}${Reset}"
     $COMMAND
   fi
 done
