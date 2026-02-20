@@ -1,3 +1,4 @@
+#18446744073709551615 largest dec
 ansi() {
   [[ -f ~/.ansi.functions ]] && source ~/.ansi.functions
 }
@@ -383,3 +384,13 @@ function_definition() {
   HHH=$(history | tail -3)
   echo $HHH
 }
+
+hex2dec() {
+  HEX=$1
+  if [[ ! "$HEX" =~ ^0x ]]; then
+    HEX="0x$1"
+  fi
+  printf '%d' $HEX;
+}
+dec2hex() { printf '%x' $1; }
+
