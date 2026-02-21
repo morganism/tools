@@ -1,13 +1,13 @@
 {
   "binary": {
-    "source": "mandarin.rb",
-    "target": "mandarin",
+    "source": "installer.rb",
+    "target": "installer",
     "destination": "/usr/local/bin",
     "chmod": "0755"
   },
   "man_pages": [
     {
-      "source": "mandarin.1",
+      "source": "installer.1",
       "section": "1",
       "destination": "/usr/local/share/man/man1"
     }
@@ -38,16 +38,14 @@
   "config_files": [],
   "post_install_notes": [
     "Ensure /usr/local/bin is in your PATH.",
-    "Generate manifest files with doc_generator.rb before using mandarin.",
-    "Run 'mandarin --check' against a manifest to verify all dependencies before installing."
+    "Generate manifests for your tools using doc_generator.rb before running installer.",
+    "Use --dry-run before any real install or uninstall to preview changes."
   ],
   "uninstall_notes": [
-    "Remove the binary: sudo rm /usr/local/bin/mandarin",
-    "Remove the man page: sudo rm /usr/local/share/man/man1/mandarin.1",
-    "Run 'mandb' to refresh the man page index after removal."
+    "Run: installer -m installer.install.json --uninstall",
+    "Or manually remove /usr/local/bin/installer and /usr/local/share/man/man1/installer.1"
   ],
-  "name": "mandarin",
+  "name": "installer",
   "version": "2.0.0",
-  "author": "morgan@morganism.dev"
+  "author": "morgan"
 }
-
