@@ -1,0 +1,89 @@
+doc_generator v2.0.0
+
+------------------------------------------------------------------------------
+DESCRIPTION
+------------------------------------------------------------------------------
+
+  Writing comprehensive documentation, man pages, and install tooling for
+  command-line Ruby scripts is tedious and error-prone. doc_generator.rb
+  automates the entire pipeline by sending the target script's source to the
+  Anthropic API, receiving a structured JSON analysis, and rendering five
+  ready-to-use output files from that single response. This lets developers ship
+  well-documented, easily installable CLI tools with minimal manual effort.
+
+------------------------------------------------------------------------------
+SYNOPSIS
+------------------------------------------------------------------------------
+
+  doc_generator.rb [options] <script.rb>
+
+------------------------------------------------------------------------------
+OPTIONS
+------------------------------------------------------------------------------
+
+  -o, --output DIR          Output directory for all generated files (default: current directory)
+  -s, --section NUM         Man page section number, 1-8 (default: 1)
+  -a, --author NAME         Author name used in the man page and installer metadata
+  -p, --prefix DIR          Install prefix for the generated installer (default: /usr/local)
+  -v, --verbose             Print progress messages to stderr during generation
+  -V, --version             Print version string and exit
+  -h, --help                Show usage help and exit
+
+------------------------------------------------------------------------------
+EXAMPLES
+------------------------------------------------------------------------------
+
+  doc_generator.rb my_tool.rb
+
+  doc_generator.rb -o ./docs -a 'Jane Doe' my_tool.rb
+
+  doc_generator.rb -s 8 -v admin_tool.rb
+
+  doc_generator.rb -o /tmp/out --prefix ~/.local my_tool.rb
+
+  doc_generator.rb -p /usr/local -a 'Morganism' json_store.rb
+
+  ANTHROPIC_API_KEY=sk-ant-xxx doc_generator.rb -o ./docs -v script.rb
+
+  doc_generator.rb --version
+
+------------------------------------------------------------------------------
+ENVIRONMENT
+------------------------------------------------------------------------------
+
+  ANTHROPIC_API_KEY         Required. Anthropic API key used to authenticate requests to the Claude API.
+  USER                      Optional. Used as the default author name if --author is not specified.
+
+------------------------------------------------------------------------------
+EXIT CODES
+------------------------------------------------------------------------------
+
+  0     Success — all output files generated
+  1     Error — missing argument, file not found, missing API key, invalid man section, API failure, or JSON parse failure
+
+------------------------------------------------------------------------------
+BUGS / LIMITATIONS
+------------------------------------------------------------------------------
+
+  The script relies on the AI model returning well-formed JSON matching the expected schema; malformed or incomplete responses will cause a parse error or missing keys. The groff escaping lambda does not handle all possible troff special characters (e.g. single quotes in certain macro contexts). There is no retry logic or rate-limit handling for the API call, and the 120-second read timeout may be insufficient for very large scripts with the chosen model.
+
+------------------------------------------------------------------------------
+SEE ALSO
+------------------------------------------------------------------------------
+
+  groff(1), man(1), ruby(1), curl(1), jq(1), mandb(8)
+
+------------------------------------------------------------------------------
+IMPLEMENTATION NOTES
+------------------------------------------------------------------------------
+
+  The entire documentation and install metadata extraction is done in a single
+  API call — the prompt is carefully structured so Claude returns both docs and
+  a machine-readable install manifest in one JSON blob, avoiding multiple
+  round-trips. The generated installer script is itself a complete, runnable
+  Ruby program with ANSI colour output, sudo support, dry-run simulation via a
+  unified act() gate function, and config-file-safe uninstallation (config files
+  are never auto-deleted). The groff escaping lambda handles leading-dot lines
+  and backslashes to prevent troff interpretation errors, a subtle but important
+  detail for correct man page rendering.
+

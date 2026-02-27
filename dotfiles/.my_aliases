@@ -25,7 +25,6 @@ alias cds='cd ~ && pushd ~/src/scalpelltd'
 alias cdm='cd ~ && pushd ~/src/morganism'
 alias tools='pushd ~/src/morganism/tools'
 alias ggu='git config --local --get remote.origin.url' # ggu == git get url : the url that you clone
-alias sudo='sudo '
 alias runvnc="vncserver -xstartup $HOME/bin/xstartup"
 #good tag
 alias werty='echo "werty"'
@@ -39,3 +38,5 @@ alias gita='git add'
 alias gitc='git commit'
 alias gitcm='git commit -m '
 alias gitp='git push'
+alias dg='doc_generator'
+
