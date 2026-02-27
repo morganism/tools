@@ -1,3 +1,8 @@
 #!/usr/bin/env bash
 
-[[ -f ~/.ansi.functions ]] && . ~/.ansi.functions || echo -e "🧚 Help on the way"
+[[ -f ~/.ansi.functions ]] && . ~/.ansi.functions || ( echo -e "🧚 Help on the way" && exit 127 )
+
+
+echo -e "🛟 "
+
+
