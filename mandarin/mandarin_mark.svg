@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300" width="300" height="300">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="50%" r="50%">
+      <stop offset="0%"   stop-color="#1a0e00"/>
+      <stop offset="100%" stop-color="#060402"/>
+    </radialGradient>
+    <radialGradient id="seg1" cx="30%" cy="30%" r="70%">
+      <stop offset="0%"   stop-color="#ffcc50"/>
+      <stop offset="100%" stop-color="#c86000"/>
+    </radialGradient>
+    <radialGradient id="seg2" cx="70%" cy="30%" r="70%">
+      <stop offset="0%"   stop-color="#ffcc50"/>
+      <stop offset="100%" stop-color="#c86000"/>
+    </radialGradient>
+    <radialGradient id="seg3" cx="50%" cy="80%" r="70%">
+      <stop offset="0%"   stop-color="#ffaa20"/>
+      <stop offset="100%" stop-color="#a84800"/>
+    </radialGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="4" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="outerBloom" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="14"/>
+    </filter>
+  </defs>
+
+  <rect width="300" height="300" fill="url(#bg)" rx="18"/>
+
+  <!-- Outer bloom -->
+  <path d="M 60 240 L 150 60 L 240 240 L 205 240 L 150 140 L 95 240 Z"
+        fill="#ff8c00" filter="url(#outerBloom)" opacity="0.35"/>
+
+  <!-- Left upstroke segment -->
+  <path d="M 58 245 L 82 245 L 150 108 L 150 135 Z"
+        fill="url(#seg1)" filter="url(#glow)"/>
+
+  <!-- Right upstroke segment -->
+  <path d="M 218 245 L 242 245 L 150 108 L 150 135 Z"
+        fill="url(#seg2)" filter="url(#glow)"/>
+
+  <!-- Left leg -->
+  <path d="M 55 58 L 80 58 L 80 245 L 55 245 Z"
+        fill="url(#seg1)" filter="url(#glow)" rx="4"/>
+
+  <!-- Right leg -->
+  <path d="M 220 58 L 245 58 L 245 245 L 220 245 Z"
+        fill="url(#seg2)" filter="url(#glow)" rx="4"/>
+
+  <!-- Left diagonal (55→150) -->
+  <path d="M 55 58 L 80 58 L 165 175 L 143 175 Z"
+        fill="url(#seg1)" filter="url(#glow)"/>
+
+  <!-- Right diagonal (245→150) -->
+  <path d="M 220 58 L 245 58 L 157 175 L 135 175 Z"
+        fill="url(#seg2)" filter="url(#glow)"/>
+
+  <!-- Segment seam lines — the citrus divider aesthetic -->
+  <g stroke="#06040280" stroke-width="2">
+    <line x1="80"  y1="58"  x2="150" y2="175"/>
+    <line x1="220" y1="58"  x2="150" y2="175"/>
+  </g>
+  <g stroke="#ffcc5030" stroke-width="1">
+    <line x1="80"  y1="58"  x2="150" y2="175"/>
+    <line x1="220" y1="58"  x2="150" y2="175"/>
+  </g>
+
+  <!-- Hot apex dot -->
+  <circle cx="150" cy="108" r="10" fill="#fff0a0" filter="url(#glow)" opacity="0.9"/>
+  <circle cx="150" cy="108" r="5"  fill="#ffffff"/>
+
+  <!-- Corner rind dots -->
+  <circle cx="67"  cy="67"  r="6" fill="#ff8c00" opacity="0.6"/>
+  <circle cx="233" cy="67"  r="6" fill="#ff8c00" opacity="0.6"/>
+
+  <!-- Wordmark -->
+  <text x="150" y="278"
+        font-family="'DejaVu Sans Mono','Courier New',monospace"
+        font-size="14" font-weight="bold" letter-spacing="4"
+        fill="#ff8c00" text-anchor="middle"
+        filter="url(#glow)">MANDARIN</text>
+</svg>

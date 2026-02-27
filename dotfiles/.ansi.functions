@@ -19,6 +19,7 @@ iItalic='\033[3m'         # Italic                #ANSI
 uUnderline='\033[4m'      # Underline             #ANSI
 fFlash='\033[5m'          # Flash                 #ANSI
 RReverse='\033[7m'        # Reverse               #ANSI
+sStrike='\033[9m'         # Strike               #ANSI
  
  
 # Regular 0
@@ -111,6 +112,26 @@ On_Blue='\033[44m'        # Blue                  #COLOUR #ANSI
 On_Purple='\033[45m'      # Purple                #COLOUR #ANSI
 On_Cyan='\033[46m'        # Cyan                  #COLOUR #ANSI
 On_White='\033[47m'       # White                 #COLOUR #ANSI
+
+On_Grey_0='\033[48;5;232m'  #(Increments up to 255)
+On_Grey_4='\033[48;5;236m'  #(Increments up to 255)
+On_Grey_8='\033[48;5;240m'  #(Increments up to 255)
+On_Grey_12='\033[48;5;244m' #(Increments up to 255)
+On_Grey_16='\033[48;5;248m' #(Increments up to 255)
+On_Grey_20='\033[48;5;252m' #(Increments up to 255)
+On_Grey_23='\033[48;5;255m' #(Increments up to 255)
+
+DGr_On_White='\033[1;90;107m'
+Gr_On_White='\033[0;90;107m'
+LGr_On_White='\033[2;90;107m'
+VLGr_On_White='\033[2;37;107m' # vv lt gr on white
+VVLGr_On_White='\033[2;47;107m' # v lt gr on white
+
+IWhite_On_Gr='\033[1;97;100m'
+White_On_Gr='\033[0;97;100m'
+VLGr_On_Gr='\033[2;97;100m'
+L_On_Gr='\033[2;30;100m'
+DGr__On_Gr='\033[0;30;100m'
  
 # Regular 0 High Intensty
 IBlack='\033[0;90m'       # Black                 #COLOUR #ANSI
@@ -220,7 +241,7 @@ cursor_left() {
 }
 cursor_move() {
   # echo -e "$(cursor_move 6 2)" # move to Line 6, Column 2
-  echo -e "\033[<L>;<C>H" # move to Line L, Column C 
+  echo -e "\033[${1};${2}f" # move to Line L, Column C 
 }
 cursor_save() {
   echo -e "\033[s" # Save current cursor position (row/col).
@@ -296,4 +317,18 @@ Clearing Screen/Lines
 printf "\033[?1049h" # Enter alternate screen
 # Your app runs here...
 printf "\033[?1049l"
+
+ESC='\033['                  # must
+X r=0,b=1,d=2                # 1 of
+Y i=3; u=4; f=5; R=7; s=9;   # multiple prepend ; if used
+A 30-7, 90-7                 # 1 of prepend ;
+B 40-7, 100-7                # 1 of prepend ; if used
+END='m'
+
+macops:vim morgan$ echo -e "${ESC}${X}[;${Y}];$A[;$B]${END}"
+
+
+Darkest: \033[38;5;232m (Increments up to 255)
+Lightest: \033[38;5;255m
+
 DOCXX

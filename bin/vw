@@ -4,19 +4,37 @@ Add description
 Author: morgan@morganism.dev
 Date: Tue 14 Oct 2025 00:01:23 BST
 DOCXX
-
 [[ -f .ansi.colours ]] && source .ansi.colours
+echo -e "${IRed}Defunct. now a function!${Reset}"
+return 127
 
 if [[ -z "$1" ]]; then
   echo -e "${Red}No file specified"
-  exit 1
+  return 1
 else
-  if [[ $(command -v $1) ]]; then
-    if [[ $(file $(command -v $1)) =~ text ]]; then
-      echo -e "Command is ${Green}OK${NC}"
-      vi $(command -v $1) 
-    else
-      echo -e "${Red} target is ${IRed}binary${Red} not text${NC}"
-    fi
-  fi
+  echo "---"
+  echo "$1"
+  type -t $1
+  echo "$(type -t $1)"
+  echo $(type -t $1)
+  echo "---"
+  COMMAND_TYPE="$(type -t $1)" # text, function 
+echo "$(type -t $1) (type -t $1)COMMAND_TYPE $COMMAND_TYPE"
+sleep 1
+  case $COMMAND_TYPE in
+
+  file)
+    echo -e "type -t $1 is 'text' .. ${Green}OK${NC}"
+    vi $(command -v $1) 
+    ;;
+
+  function)
+    read __FNAME __FLINE __FFILE < <((shopt -s extdebug; declare -F $1))
+    vi +$__FLINE $__FFILE
+    ;;
+
+  *)
+    echo -e "${dBlue}No Match for ${IWhite}${COMMAND_TYPE}${Reset}"
+    ;;
+  esac
 fi

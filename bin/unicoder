@@ -1,0 +1,47 @@
+#!/usr/local/bin/bash
+: <<DOCXX
+
+Author: morgan@morganism.dev
+Date: Fri 20 Feb 2026 02:01:54 GMT
+DOCXX
+CODE="$1"
+THIS="$(basename ${BASH_SOURCE})"
+DESC="${THIS}: display unicode character for codepoint"
+
+hex2dec() {
+  N=$1
+  if [[ ! "$N" =~ ^0x ]]; then
+    N="0x$N"
+  fi
+
+  printf '%d' $N;
+}
+
+dec2hex() { 
+  N=$1
+  printf -v N '%x' $N 
+
+  if [[ ! "$N" =~ ^0x ]]; then
+    N="0x$N"
+  fi
+  echo -n $N
+}
+
+usage() {
+  message="${1:-${DESC}}"
+  echo "${message}"
+  echo "Usage: ${THIS} <CODEPOINT>"
+  return 1
+}
+
+[[ -z "${CODE}" ]] && usage
+[[ ! "$CODE" =~ ^0x ]] && CODE="0x$CODE"
+
+#printf "%b\n" "$(printf '\\U%08X' ${CODE})"
+
+hex=$(dec2hex $1)
+dec=$(hex2dec $1)
+echo "hex[$hex] dec[$dec]"
+printf "%b\n" "$(printf '\\U%08X' ${hex})"
+printf "%b\n" "$(printf '\\U%08X' ${dec})"
+

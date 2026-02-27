@@ -1,7 +1,9 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-set -euo pipefail
+[[ -f ~/.ansi.functions ]] && . ~/.ansi.functions || ( echo -e "🧚 Help on the way" && exit 127 )
 
-exit 1
-DIRS=".bin .bootstrap src/morganism"
-SETS="bash env git vi 
+
+echo -e "🛟 "
+
+echo "https://raw.githubusercontent.com/morganism/tools/refs/heads/master/bootstrap"
+
