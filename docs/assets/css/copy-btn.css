@@ -1,0 +1,13 @@
+
+/* copy button */
+.copy-btn{
+  padding:.55rem 2rem;
+  font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:.25em;
+  background:transparent;border:1px solid var(--mid);color:var(--faint);
+  cursor:pointer;transition:all .15s;position:relative;overflow:hidden;z-index:1;
+}
+.copy-btn::before{content:'';position:absolute;inset:0;background:var(--hi);transform:translateX(-101%);transition:transform .22s;z-index:-1}
+.copy-btn:hover{border-color:var(--hi);color:var(--bg)}
+.copy-btn:hover::before{transform:translateX(0)}
+.copy-btn.copied{border-color:var(--hi);color:var(--hi)}
+
