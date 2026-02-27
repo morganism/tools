@@ -241,7 +241,7 @@ cursor_left() {
 }
 cursor_move() {
   # echo -e "$(cursor_move 6 2)" # move to Line 6, Column 2
-  echo -e "\033[<L>;<C>H" # move to Line L, Column C 
+  echo -e "\033[${1};${2}f" # move to Line L, Column C 
 }
 cursor_save() {
   echo -e "\033[s" # Save current cursor position (row/col).

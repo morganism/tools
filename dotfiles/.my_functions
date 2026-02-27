@@ -235,7 +235,7 @@ bindreset() {
 git() {
   GIT_CMD="/usr/local/git/bin/git"
   GIT_BRANCH=$($GIT_CMD branch -l | grep ^\* | sed -e 's:^\* ::')
-  if [[ $1 = "push" ]]; then
+  if [[ $1 = "push" ]] && [[ ! "$GIT_BRANCH" =~ master ]]; then
     ansi
     echo -e "${Blue}${On_White}wrap 'git push'${Reset}"
     if  [[ $($GIT_CMD push 2>&1| grep 'has no upstream') ]]; then
