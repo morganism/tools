@@ -5,4 +5,5 @@
 
 echo -e "🛟 "
 
+echo "https://raw.githubusercontent.com/morganism/tools/refs/heads/master/bootstrap"
 
