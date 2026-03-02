@@ -1,0 +1,404 @@
+/* PixelForge :: Retro phosphor terminal aesthetic */
+
+:root {
+  --phosphor: #39ff14;
+  --phosphor-dim: #1a8a06;
+  --phosphor-glow: rgba(57, 255, 20, 0.4);
+  --phosphor-faint: rgba(57, 255, 20, 0.08);
+  --bg:   #020a02;
+  --bg2:  #060e06;
+  --bg3:  #0b160b;
+  --panel-border: #1d4a1d;
+  --accent: #ff6b35;
+  --accent2: #ffd700;
+  --text: #c8f5c8;
+  --text-dim: #4a7a4a;
+  --font-mono: 'Share Tech Mono', monospace;
+  --font-display: 'Orbitron', monospace;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  width: 100%; height: 100%;
+  background: var(--bg);
+  color: var(--phosphor);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  overflow-x: hidden;
+}
+
+/* ── Atmosphere ─────────────────────────────────────────────────────────── */
+.scanlines {
+  pointer-events: none;
+  position: fixed; inset: 0; z-index: 999;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0px,
+    transparent 2px,
+    rgba(0,0,0,0.15) 2px,
+    rgba(0,0,0,0.15) 4px
+  );
+}
+
+.vignette {
+  pointer-events: none;
+  position: fixed; inset: 0; z-index: 998;
+  background: radial-gradient(ellipse at center,
+    transparent 60%,
+    rgba(0,0,0,0.7) 100%
+  );
+}
+
+/* ── Header ─────────────────────────────────────────────────────────────── */
+header {
+  border-bottom: 1px solid var(--panel-border);
+  padding: 16px 24px 12px;
+  background: var(--bg2);
+  box-shadow: 0 2px 20px rgba(57,255,20,0.05);
+}
+
+.logo {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 900;
+  letter-spacing: 4px;
+  text-shadow: 0 0 20px var(--phosphor-glow), 0 0 40px rgba(57,255,20,0.2);
+}
+
+.logo-bracket  { color: var(--phosphor-dim); }
+.logo-main     { color: var(--phosphor); }
+.logo-accent   { color: var(--accent2); text-shadow: 0 0 15px rgba(255,215,0,0.5); }
+
+.header-sub {
+  font-size: 10px;
+  letter-spacing: 3px;
+  color: var(--text-dim);
+  margin-top: 4px;
+}
+
+.header-status {
+  font-size: 11px;
+  color: var(--phosphor-dim);
+  margin-top: 6px;
+  letter-spacing: 1px;
+}
+
+/* ── Layout ─────────────────────────────────────────────────────────────── */
+main {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 0;
+  min-height: calc(100vh - 120px);
+}
+
+section {
+  padding: 16px;
+  border-right: 1px solid var(--panel-border);
+}
+
+.panel-title {
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--text-dim);
+  margin-bottom: 14px;
+  border-bottom: 1px solid var(--panel-border);
+  padding-bottom: 6px;
+}
+
+/* ── Canvas / Viewport ──────────────────────────────────────────────────── */
+.viewport-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  background: var(--bg);
+}
+
+.canvas-wrapper {
+  position: relative;
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+#main-canvas {
+  display: block;
+  cursor: crosshair;
+  border: 1px solid var(--phosphor-dim);
+  box-shadow:
+    0 0 0 1px var(--bg),
+    0 0 20px var(--phosphor-glow),
+    0 0 60px rgba(57,255,20,0.1);
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+#zoom-canvas {
+  border: 1px solid var(--panel-border);
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  box-shadow: 0 0 10px rgba(57,255,20,0.15);
+}
+
+.pixel-info {
+  font-size: 11px;
+  color: var(--text-dim);
+  letter-spacing: 1px;
+  font-family: var(--font-mono);
+  padding: 6px 12px;
+  border: 1px solid var(--panel-border);
+  background: var(--bg2);
+  border-radius: 2px;
+}
+
+/* ── Controls Panel ─────────────────────────────────────────────────────── */
+.controls-panel {
+  background: var(--bg2);
+  overflow-y: auto;
+  border-right: none;
+}
+
+.ctrl-group {
+  margin-bottom: 16px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid rgba(29,74,29,0.4);
+}
+
+.ctrl-group:last-child { border-bottom: none; }
+
+.ctrl-group > label {
+  display: block;
+  font-size: 9px;
+  letter-spacing: 3px;
+  color: var(--text-dim);
+  margin-bottom: 8px;
+  font-family: var(--font-display);
+}
+
+/* ── Selects & Inputs ───────────────────────────────────────────────────── */
+select {
+  background: var(--bg3);
+  color: var(--phosphor);
+  border: 1px solid var(--phosphor-dim);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  padding: 5px 8px;
+  width: 100%;
+  outline: none;
+  cursor: pointer;
+  margin-bottom: 8px;
+}
+
+select:hover { border-color: var(--phosphor); }
+
+input[type="range"] {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 4px;
+  background: var(--bg3);
+  border: 1px solid var(--panel-border);
+  outline: none;
+  cursor: pointer;
+  border-radius: 0;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px; height: 14px;
+  background: var(--phosphor);
+  border: 2px solid var(--bg);
+  cursor: pointer;
+  box-shadow: 0 0 8px var(--phosphor-glow);
+}
+
+/* ── Buttons ────────────────────────────────────────────────────────────── */
+button {
+  background: var(--bg3);
+  color: var(--phosphor);
+  border: 1px solid var(--phosphor-dim);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  padding: 5px 10px;
+  cursor: pointer;
+  letter-spacing: 1px;
+  transition: all 0.1s;
+}
+
+button:hover {
+  background: var(--phosphor-faint);
+  border-color: var(--phosphor);
+  box-shadow: 0 0 10px var(--phosphor-glow);
+  color: #fff;
+}
+
+button.active {
+  background: rgba(57,255,20,0.15);
+  border-color: var(--phosphor);
+  color: #fff;
+  box-shadow: 0 0 8px var(--phosphor-glow);
+}
+
+#load-btn {
+  width: 100%;
+  padding: 7px;
+  font-family: var(--font-display);
+  font-size: 12px;
+  letter-spacing: 2px;
+  color: var(--accent2);
+  border-color: var(--accent2);
+}
+
+#load-btn:hover {
+  background: rgba(255,215,0,0.1);
+  box-shadow: 0 0 12px rgba(255,215,0,0.3);
+  color: #fff;
+}
+
+/* ── Bit depth grid ─────────────────────────────────────────────────────── */
+.depth-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+}
+
+.depth-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 6px 4px;
+  gap: 2px;
+}
+
+.depth-btn .bits { font-size: 13px; font-weight: bold; }
+.depth-btn .colors { font-size: 9px; color: var(--text-dim); }
+
+.depth-btn.active {
+  background: rgba(57,255,20,0.2);
+  border-color: var(--phosphor);
+}
+
+/* ── Playback row ───────────────────────────────────────────────────────── */
+.playback-row {
+  display: flex;
+  gap: 4px;
+}
+
+.playback-row button { flex: 1; }
+#btn-play { flex: 2; }
+
+/* ── Toggles ────────────────────────────────────────────────────────────── */
+.toggle-row { display: flex; gap: 6px; }
+.toggle-btn { flex: 1; }
+
+/* ── Frame bar ──────────────────────────────────────────────────────────── */
+.frame-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+#frame-track {
+  flex: 1;
+  height: 8px;
+  background: var(--bg3);
+  border: 1px solid var(--panel-border);
+  position: relative;
+  cursor: pointer;
+}
+
+#frame-thumb {
+  position: absolute;
+  top: 0; left: 0;
+  height: 100%;
+  width: 0%;
+  background: var(--phosphor);
+  transition: width 0.05s;
+  box-shadow: 2px 0 8px var(--phosphor-glow);
+}
+
+#frame-counter {
+  font-size: 11px;
+  color: var(--text-dim);
+  min-width: 50px;
+  text-align: right;
+}
+
+/* ── Palette grid ───────────────────────────────────────────────────────── */
+#palette-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  max-height: 80px;
+  overflow-y: auto;
+}
+
+.pal-swatch {
+  width: 14px; height: 14px;
+  border: 1px solid rgba(255,255,255,0.1);
+  cursor: default;
+  flex-shrink: 0;
+}
+
+.pal-swatch:hover { border-color: var(--phosphor); transform: scale(1.3); }
+
+/* ── Info box ───────────────────────────────────────────────────────────── */
+.info-box {
+  background: var(--bg3);
+  border: 1px solid var(--panel-border);
+  padding: 8px;
+  font-size: 11px;
+  color: var(--text-dim);
+  line-height: 1.5;
+  min-height: 40px;
+}
+
+/* ── Export row ─────────────────────────────────────────────────────────── */
+.export-row { display: flex; gap: 6px; }
+.export-row button { flex: 1; font-size: 10px; }
+
+/* ── Footer ─────────────────────────────────────────────────────────────── */
+footer {
+  border-top: 1px solid var(--panel-border);
+  padding: 8px 24px;
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--text-dim);
+  display: flex;
+  gap: 16px;
+  background: var(--bg2);
+}
+
+/* ── Utilities ──────────────────────────────────────────────────────────── */
+.blink {
+  animation: blink 1s step-end infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+
+/* ── Scrollbar ──────────────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg3); }
+::-webkit-scrollbar-thumb { background: var(--phosphor-dim); }
+::-webkit-scrollbar-thumb:hover { background: var(--phosphor); }
+
+/* ── Loading overlay ────────────────────────────────────────────────────── */
+#loading {
+  display: none;
+  position: absolute;
+  inset: 0;
+  background: rgba(2,10,2,0.85);
+  color: var(--phosphor);
+  font-family: var(--font-display);
+  font-size: 14px;
+  letter-spacing: 4px;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+}
+
+#loading.visible { display: flex; }

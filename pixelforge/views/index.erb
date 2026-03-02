@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PixelForge :: 32×32 Animation Studio</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<div class="scanlines"></div>
+<div class="vignette"></div>
+
+<header>
+  <div class="logo">
+    <span class="logo-bracket">[</span>
+    <span class="logo-main">PIXEL</span><span class="logo-accent">FORGE</span>
+    <span class="logo-bracket">]</span>
+  </div>
+  <div class="header-sub">32×32 :: ANIMATION STUDIO :: MULTI-BIT-DEPTH RENDERER</div>
+  <div class="header-status">
+    <span class="blink">▮</span>
+    SYS: ONLINE &nbsp;|&nbsp; VRAM: 4KB &nbsp;|&nbsp; MODE: <span id="mode-label">24BPP</span>
+  </div>
+</header>
+
+<main>
+
+  <!-- ═══ VIEWPORT ═══════════════════════════════════════════════════════ -->
+  <section class="viewport-panel">
+    <div class="panel-title">── DISPLAY ──────────────────────────────────────</div>
+    <div class="canvas-wrapper">
+      <canvas id="main-canvas" width="320" height="320"></canvas>
+      <canvas id="zoom-canvas" width="128" height="128"></canvas>
+    </div>
+    <div class="pixel-info">
+      CURSOR: <span id="cursor-xy">--,--</span> &nbsp;|&nbsp;
+      RGB: <span id="cursor-rgb">---,---,---</span> &nbsp;|&nbsp;
+      HEX: <span id="cursor-hex">#------</span>
+    </div>
+  </section>
+
+  <!-- ═══ CONTROLS ════════════════════════════════════════════════════════ -->
+  <section class="controls-panel">
+    <div class="panel-title">── CONTROLS ─────────────────────────────────────</div>
+
+    <!-- Animation selector -->
+    <div class="ctrl-group">
+      <label>ANIMATION</label>
+      <select id="anim-select">
+        <% @animations.each do |name| %>
+          <option value="<%= name %>"><%= name.upcase.gsub('_',' ') %></option>
+        <% end %>
+      </select>
+      <button id="load-btn">LOAD ▶</button>
+    </div>
+
+    <!-- Bit depth -->
+    <div class="ctrl-group">
+      <label>BIT DEPTH</label>
+      <div class="depth-grid">
+        <% @bit_depths.each do |bits, label| %>
+          <button class="depth-btn <%= bits == 24 ? 'active' : '' %>" data-bits="<%= bits %>">
+            <span class="bits"><%= bits %>b</span>
+            <span class="colors"><%= 2**bits < 1_000_000 ? "#{2**bits}c" : '16Mc' %></span>
+          </button>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Playback -->
+    <div class="ctrl-group">
+      <label>PLAYBACK</label>
+      <div class="playback-row">
+        <button id="btn-prev" title="Previous frame">◀◀</button>
+        <button id="btn-play" class="active">▶ PLAY</button>
+        <button id="btn-next" title="Next frame">▶▶</button>
+        <button id="btn-loop" class="active" title="Loop">↻</button>
+      </div>
+    </div>
+
+    <!-- Speed -->
+    <div class="ctrl-group">
+      <label>SPEED  <span id="fps-display">??</span> FPS</label>
+      <input type="range" id="speed-slider" min="1" max="60" value="20">
+    </div>
+
+    <!-- Zoom -->
+    <div class="ctrl-group">
+      <label>SCALE  <span id="zoom-display">10×</span></label>
+      <input type="range" id="zoom-slider" min="1" max="20" value="10">
+    </div>
+
+    <!-- Grid overlay -->
+    <div class="ctrl-group">
+      <label>OVERLAY</label>
+      <div class="toggle-row">
+        <button class="toggle-btn" id="grid-toggle" data-on="false">GRID: OFF</button>
+        <button class="toggle-btn" id="dither-toggle" data-on="false">DITHER: OFF</button>
+      </div>
+    </div>
+
+    <!-- Frame counter -->
+    <div class="ctrl-group">
+      <label>FRAME</label>
+      <div class="frame-bar">
+        <div id="frame-track">
+          <div id="frame-thumb"></div>
+        </div>
+        <span id="frame-counter">0 / 0</span>
+      </div>
+    </div>
+
+    <!-- Palette viewer -->
+    <div class="ctrl-group" id="palette-section">
+      <label>PALETTE</label>
+      <div id="palette-grid"></div>
+    </div>
+
+    <!-- Info readout -->
+    <div class="ctrl-group">
+      <label>ANIMATION INFO</label>
+      <div id="anim-info" class="info-box">Select an animation and press LOAD.</div>
+    </div>
+
+    <!-- Export -->
+    <div class="ctrl-group">
+      <label>EXPORT</label>
+      <div class="export-row">
+        <button id="export-png">PNG FRAME</button>
+        <button id="export-json">DUMP JSON</button>
+      </div>
+    </div>
+
+  </section>
+
+</main>
+
+<footer>
+  <span>PIXELFORGE v1.0 :: RUBY/SINATRA BACKEND ::</span>
+  <span class="blink">_</span>
+</footer>
+
+<script src="/js/renderer.js"></script>
+</body>
+</html>
