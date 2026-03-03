@@ -39,4 +39,5 @@ alias gitc='git commit'
 alias gitcm='git commit -m '
 alias gitp='git push'
 alias dg='doc_generator'
-
+alias thanksgiving='date -v1d -v+9m -v-1d -v-thu -j'
+alias gits='git status'
