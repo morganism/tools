@@ -1,0 +1,16 @@
+{
+  "Info": {
+    "Repo": "tools",
+    "Owner": "morganism",
+    "Email": "morgan@morganism.dev",
+    "Summary": "",
+    "URL": "https://github.com/morganism/tools.git",
+    "Description": "",
+    "GitHub Page": "tools.morganism.dev"
+  },
+  "Commands": {
+    [
+      "curl -sL https://raw.githubusercontent.com/morganism/tools/refs/heads/master/message | bash"
+    ]
+  }
+}
