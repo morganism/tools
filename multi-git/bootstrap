@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+: <<DOCXX
+
+*** multigit ***
+
+Multigit allows checking out multiple git repositories overlaid onto the same directory.
+
+It is useful for projects which are made of different components that are developed separately, 
+but which need to track files from different parts of the directory structure of the project.
+
+Author: morgan@morganism.dev
+Date: Tue 17 Mar 2026 06:05:33 GMT
+DOCXX
+
+CMD_SOURCE="https://raw.githubusercontent.com/capr/multigit/refs/heads/master/mgit"
+LOCAL_PATH="$HOME/bin/mgit"
+
+mkdir -p "$(dirname "$LOCAL_PATH")"
+curl -fsSL "$CMD_SOURCE" -o "$LOCAL_PATH"
+chmod +x "$LOCAL_PATH"

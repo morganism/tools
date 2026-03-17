@@ -319,8 +319,7 @@ port() {
 
 command_not_found_handle () {
   ansi
-  echo -e "${IRed}${On_White} ${BASH_SOURCE}[command_not_found_handle()]#[${BASH_LINENO}] invoked${Reset}"
-  #find / -type d -name '*bin*' -o -name '.*/bin'
+  echo -e "🔔 ${IRed}${On_White} ${BASH_SOURCE}[command_not_found_handle()]#[${BASH_LINENO}] invoked${Reset}"
 }
 where_am_i () {
   ansi
@@ -393,4 +392,6 @@ hex2dec() {
   printf '%d' $HEX;
 }
 dec2hex() { printf '%x' $1; }
-
+ls_link() {
+  readlink `which $1` || which $1
+}

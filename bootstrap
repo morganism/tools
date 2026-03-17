@@ -5,5 +5,6 @@
 
 echo -e "🛟 "
 
-echo "https://raw.githubusercontent.com/morganism/tools/refs/heads/master/bootstrap"
+echo "https://raw.githubusercontent.com/morganism/tools/refs/heads/master/message"
+curl "https://raw.githubusercontent.com/morganism/tools/refs/heads/master/message"
 

@@ -14,9 +14,7 @@ if [[ -z "$1" ]]; then
 else
   echo "---"
   echo "$1"
-  type -t $1
-  echo "$(type -t $1)"
-  echo $(type -t $1)
+  type -t "$1"
   echo "---"
   COMMAND_TYPE="$(type -t $1)" # text, function 
 echo "$(type -t $1) (type -t $1)COMMAND_TYPE $COMMAND_TYPE"
