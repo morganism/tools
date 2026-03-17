@@ -33,12 +33,12 @@ run_script() {
 }
 
 run_all_tasks() {
-    if [ -d "$TASKS" ]; then
-        for task in "$TASKS"/*.sh; do
-            [ -e "$task" ] || continue
-            run_script "$task"
-        done
-    fi
+    [ -d "$TASKS" ] || return
+
+    find "$TASKS" -type f -perm -111 -print0 |
+    while IFS= read -r -d '' task; do
+        run_script "$task"
+    done
 }
 
 main() {
