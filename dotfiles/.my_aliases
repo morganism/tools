@@ -39,4 +39,4 @@ alias gitc='git commit'
 alias gitcm='git commit -m '
 alias gitp='git push'
 alias dg='doc_generator'
-
+alias mogz='ruby /Users/morgan/data/src/morganism/totp/totp.rb --current --secret HBTWGWHPDAUPSZOZACQ3CD57UBWOZE5A819007'
