@@ -4,5 +4,6 @@ Add description
 Author: morgan@morganism.dev
 Date: Mon  9 Mar 2026 15:09:14 GMT
 DOCXX
+[[ -f ~/.ansi.functions ]] && source ~/.ansi.functions
 
 echo -e "\e[0;31m This is a test message\e[0m"
