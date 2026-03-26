@@ -1,0 +1,308 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# mgmt — CLI for management.rb
+#
+# Usage:
+#   mgmt init                                  # create all known tables
+#   mgmt tables                                # list tables in the DB
+#   mgmt schema TABLE                          # show column schema
+#   mgmt sql "SELECT * FROM repo"              # raw SQL
+#
+#   mgmt repo list                             # list all repos
+#   mgmt repo list --name dotforge            # filter by column value
+#   mgmt repo show UUID                        # show single row
+#   mgmt repo add --name foo --url http://...  # insert
+#   mgmt repo update UUID --name bar           # update fields
+#   mgmt repo delete UUID                      # delete
+#   mgmt repo count                            # row count
+#
+#   mgmt ANYTABLE list|show|add|update|delete|count
+
+$LOAD_PATH.unshift(File.dirname(__FILE__))
+require 'thor'
+require 'management'
+
+# ── Terminal helpers ──────────────────────────────────────────────────────────
+
+module ANSI
+  RESET  = "\e[0m"
+  BOLD   = "\e[1m"
+  DIM    = "\e[2m"
+  RED    = "\e[31m"
+  GREEN  = "\e[32m"
+  YELLOW = "\e[33m"
+  CYAN   = "\e[36m"
+
+  def self.colorize(str, *codes)
+    $stdout.tty? ? "#{codes.join}#{str}#{RESET}" : str
+  end
+end
+
+module Display
+  def self.table(rows, title: nil)
+    return puts ANSI.colorize('(no rows)', ANSI::DIM) if rows.empty?
+
+    headers = rows.first.keys.reject { |k| k.is_a?(Integer) }
+    widths  = headers.map { |h| [h.length, rows.map { |r| r[h].to_s.length }.max].max }
+
+    puts ANSI.colorize("── #{title} ", ANSI::CYAN, ANSI::BOLD) if title
+    hr = widths.map { |w| '─' * (w + 2) }.join('┼')
+    puts "┌#{hr.tr('┼', '┬')}┐"
+
+    header_cells = headers.each_with_index.map { |h, i|
+      ANSI.colorize(" %-#{widths[i]}s " % h, ANSI::BOLD, ANSI::CYAN)
+    }.join('│')
+    puts "│#{header_cells}│"
+    puts "├#{hr}┤"
+
+    rows.each do |row|
+      cells = headers.each_with_index.map { |h, i|
+        val = row[h].to_s
+        val = val[0..7] + '…' if h == 'id' && val.length == 36 && headers.length > 1
+        " %-#{widths[i]}s " % val
+      }.join('│')
+      puts "│#{cells}│"
+    end
+    puts "└#{hr.tr('┼', '┴')}┘"
+  end
+
+  def self.record(row, title: nil)
+    return puts ANSI.colorize('(not found)', ANSI::RED) if row.nil?
+
+    keys = row.keys.reject { |k| k.is_a?(Integer) }
+    max  = keys.map(&:length).max
+    puts ANSI.colorize("── #{title} ", ANSI::CYAN, ANSI::BOLD) if title
+    keys.each do |k|
+      label = ANSI.colorize("%-#{max}s" % k, ANSI::BOLD, ANSI::YELLOW)
+      puts "  #{label}  #{row[k]}"
+    end
+  end
+
+  def self.ok(msg)   = puts(ANSI.colorize("✓ #{msg}", ANSI::GREEN))
+  def self.err(msg)  = warn(ANSI.colorize("✗ #{msg}", ANSI::RED))
+  def self.info(msg) = puts(ANSI.colorize("  #{msg}", ANSI::DIM))
+end
+
+# ── Argument parser ───────────────────────────────────────────────────────────
+# Parses ["--name", "foo", "--url", "http://x", "UUID"] into
+#   { positional: ["UUID"], options: { "name" => "foo", "url" => "http://x" } }
+
+module ArgParser
+  def self.parse(argv)
+    opts = {}
+    pos  = []
+    i    = 0
+    while i < argv.length
+      arg = argv[i]
+      if arg.start_with?('--')
+        key = arg.sub(/\A--/, '')
+        if key.include?('=')
+          k, v = key.split('=', 2)
+          opts[k] = v
+        elsif i + 1 < argv.length && !argv[i + 1].start_with?('-')
+          opts[key] = argv[i + 1]
+          i += 1
+        else
+          opts[key] = true
+        end
+      elsif arg.start_with?('-') && arg.length == 2
+        if i + 1 < argv.length && !argv[i + 1].start_with?('-')
+          opts[arg[1..]] = argv[i + 1]
+          i += 1
+        else
+          opts[arg[1..]] = true
+        end
+      else
+        pos << arg
+      end
+      i += 1
+    end
+    { positional: pos, options: opts }
+  end
+end
+
+# ── TableDispatch — plain Ruby, no Thor ──────────────────────────────────────
+
+class TableDispatch
+  VERBS = %w[list show add update delete count help].freeze
+
+  def initialize(db, table)
+    @db    = db
+    @table = table
+  end
+
+  def dispatch(argv)
+    parsed = ArgParser.parse(argv)
+    verb   = parsed[:positional].shift || 'help'
+    opts   = parsed[:options]
+    args   = parsed[:positional]
+
+    unless VERBS.include?(verb)
+      Display.err("Unknown verb '#{verb}' for table '#{@table}'.")
+      usage; exit 1
+    end
+
+    send(verb, args, opts)
+  end
+
+  private
+
+  def list(_args, opts)
+    limit = opts.delete('limit') || opts.delete('n')
+    order = opts.delete('order') || opts.delete('o')
+    rows  = @db.list(@table, where: opts, order: order, limit: limit&.to_i)
+    Display.table(rows, title: "#{@table} (#{rows.size} rows)")
+  end
+
+  def show(args, _opts)
+    id = args.shift or fail_usage('show', 'UUID required')
+    Display.record(@db.find(@table, id), title: "#{@table} / #{id[0..7]}")
+  end
+
+  def add(_args, opts)
+    fail_usage('add', 'provide at least one --col=val') if opts.empty?
+    id = @db.insert(@table, opts)
+    Display.ok("Inserted into #{@table} → id: #{id}")
+  end
+
+  def update(args, opts)
+    id = args.shift or fail_usage('update', 'UUID required')
+    fail_usage('update', 'provide at least one --col=val') if opts.empty?
+    n = @db.update(@table, id, opts)
+    n > 0 ? Display.ok("Updated #{n} row(s) in #{@table}") : Display.err("No rows matched id: #{id}")
+  end
+
+  def delete(args, _opts)
+    id = args.shift or fail_usage('delete', 'UUID required')
+    n  = @db.delete(@table, id)
+    n > 0 ? Display.ok("Deleted #{n} row(s) from #{@table}") : Display.err("No rows matched id: #{id}")
+  end
+
+  def count(_args, _opts)
+    n = @db.count(@table)
+    puts "#{ANSI.colorize(@table, ANSI::CYAN)}: #{ANSI.colorize(n.to_s, ANSI::BOLD)} row(s)"
+  end
+
+  def help(_a = nil, _o = nil) = usage
+
+  def usage
+    puts ANSI.colorize("  mgmt #{@table} <verb> [options]", ANSI::BOLD)
+    puts ANSI.colorize("  verbs: #{VERBS.join('  ')}", ANSI::DIM)
+    puts
+    puts "  list   [--col=val ...]  [--limit=N]  [--order=col]"
+    puts "  show   <uuid>"
+    puts "  add    --col=val ..."
+    puts "  update <uuid>  --col=val ..."
+    puts "  delete <uuid>"
+    puts "  count"
+  end
+
+  def fail_usage(verb, msg)
+    Display.err("#{verb}: #{msg}")
+    usage; exit 1
+  end
+end
+
+# ── Root CLI (Thor — meta commands only) ─────────────────────────────────────
+
+class MgmtCLI < Thor
+  class_option :db, type: :string, default: 'management.db',
+               aliases: '-d', desc: 'Path to SQLite3 database'
+
+  def self.exit_on_failure? = true
+
+  desc 'version', 'Print version'
+  def version
+    puts "mgmt #{Management::VERSION} — SQLite3 table manager"
+  end
+
+  desc 'init', 'Create all known tables'
+  def init
+    with_db { |db| db.init_schema!; Display.ok("Initialised schema in #{options[:db]}") }
+  end
+
+  desc 'tables', 'List tables in the database'
+  def tables
+    with_db do |db|
+      Display.table(db.tables.map { |n| { 'table' => n } }, title: options[:db])
+    end
+  end
+
+  desc 'schema TABLE', 'Show column schema for TABLE'
+  def schema(table)
+    with_db do |db|
+      puts ANSI.colorize("── schema: #{table}", ANSI::CYAN, ANSI::BOLD)
+      puts db.schema(table)
+    end
+  end
+
+  desc 'sql STATEMENT', 'Execute raw SQL'
+  def sql(statement)
+    with_db do |db|
+      rows = db.exec_sql(statement)
+      rows.is_a?(Array) && rows.first.is_a?(Hash) ? Display.table(rows, title: 'result') : Display.ok('Done.')
+    end
+  rescue SQLite3::Exception => e
+    Display.err("SQL error: #{e.message}"); exit 1
+  end
+
+  private
+
+  def with_db
+    db = Management.new(options[:db])
+    yield db
+  rescue SQLite3::Exception => e
+    Display.err("DB error: #{e.message}"); exit 1
+  ensure
+    db&.close
+  end
+end
+
+# ── Entrypoint ────────────────────────────────────────────────────────────────
+
+if __FILE__ == $PROGRAM_NAME
+  META_COMMANDS = %w[version init tables schema sql help].freeze
+
+  def self.pluck_opt(argv, *flags)
+    argv = argv.dup; val = nil
+    flags.each do |flag|
+      if (m = argv.grep(/\A#{Regexp.escape(flag)}=(.+)\z/).first)
+        val = m.split('=', 2).last; argv.delete(m)
+      elsif (idx = argv.index(flag))
+        val = argv[idx + 1]; argv.delete_at(idx + 1); argv.delete_at(idx)
+      end
+    end
+    [val, argv]
+  end
+
+  db_path, argv = pluck_opt(ARGV.dup, '-d', '--db')
+  db_path ||= 'management.db'
+
+  first = argv.reject { |a| a.start_with?('-') }.first
+
+  if first.nil? || META_COMMANDS.include?(first)
+    MgmtCLI.start(ARGV)
+
+  elsif TableDispatch::VERBS.include?(first)
+    Display.err("Missing table name before '#{first}'.")
+    Display.info("Usage:   mgmt <table> #{first} [options]")
+    Display.info("Example: mgmt repo #{first} #{argv.drop(1).join(' ')}")
+    exit 1
+
+  else
+    table = argv.shift
+    begin
+      db = Management.new(db_path)
+      # Auto-create table if it is a known schema and does not yet exist
+      db.init_table!(table) if Management::SCHEMAS.key?(table)
+      TableDispatch.new(db, table).dispatch(argv)
+    rescue ArgumentError => e
+      Display.err(e.message); exit 1
+    rescue SQLite3::Exception => e
+      Display.err("DB error: #{e.message}"); exit 1
+    ensure
+      db&.close
+    end
+  end
+end

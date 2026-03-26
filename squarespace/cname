@@ -1,0 +1,41 @@
+#!/usr/bin/env ruby
+
+host = ARGV[0] || 'example'
+record_type = 'CNAME'
+date = 'morganism.github.io'
+ttl = '1800' # 30m
+
+require "playwright"
+
+
+
+Playwright.create(playwright_cli_executable_path: "npx playwright") do |playwright|
+  browser = playwright.chromium.launch(headless: false)
+  context = browser.new_context # <- no storage_state
+  page = context.new_page
+
+  # First run: login manually and save session
+  unless File.exist?("auth.json")
+    page.goto("https://account.squarespace.com")
+    puts "Login manually (Google etc), then press enter..."
+    STDIN.gets
+    context.storage_state(path: "auth.json")
+  end
+
+  # Now you're authenticated
+  page.goto("https://account.squarespace.com/domains/managed/morganism.dev/dns/dns-settings")
+
+  # Click "Add record"
+  page.click("text=Add record")
+
+  # Fill form (selectors may need tweaking)
+  page.fill('input[name="host"]', host)
+  page.select_option('select[name="type"]', record_type)
+  page.fill('input[name="data"]', data)
+  page.select_option('select[name="ttl"]', ttl)
+
+  page.click("text=Save")
+
+  sleep 3
+  browser.close
+end

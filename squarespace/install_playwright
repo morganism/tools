@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+: <<DOCXX
+Add description
+Author: morgan@morganism.dev
+Date: Thu 19 Mar 2026 09:24:37 GMT
+DOCXX
+bundle add playwright-ruby-client
+playwright install
+
