@@ -1,0 +1,31 @@
+#!/usr/bin/env ruby
+<<DOCXX
+remove duplicate PATH elements that resolve to the same 'realpath'
+
+Example: 
+before PATH="/foo:/bar/:/foo/:/foo"
+after  PATH="/foo:/bar"
+n.b. paths beginning with ~ are retained
+Author: morgan@morganism.dev
+Date: Thu  9 Apr 2026 22:15:13 BST
+DOCXX
+
+def path
+  ENV['PATH']
+end
+
+def dedupe p=path
+  p2 = Array.new
+  p.split(':').each do |e| 
+    if File.exist? e
+      f = File.new e
+      f2 = File.realdirpath f
+      p2.push f2 unless p2.include? f2
+    else
+      p2.push e unless p2.include? e
+    end
+  end
+  p2.join ':'
+end
+
+puts dedupe

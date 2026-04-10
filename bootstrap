@@ -1,10 +1,40 @@
 #!/usr/bin/env bash
 
+THIS_PATH() {
+  # return absolute path to the script where THIS_PATH is called from
+    realpath "${BASH_SOURCE[1]}"
+}
+THIS_DIR() {
+    dirname "$(realpath "${BASH_SOURCE[1]}")"
+}
+THIS_FILE() {
+    basename "$(realpath "${BASH_SOURCE[1]}")"
+}
+
+
 [[ -f ~/.ansi.functions ]] && . ~/.ansi.functions || ( echo -e "🧚 Help on the way" && exit 127 )
 
+# create ~/.my_bash_profile link and add call to ~/.bash_profile (mac) ~/.bashrc (linux)
+link_bash_profile() {
+  ln -sf $(THIS_DIR)/dotfiles/.my_bash_profile ~/.my_bash_profile
+}
+fix_bash_profile() {
+  grep -v 'source ~/.my_bash_profile' ~/.bash_profile > ~/.bash_profile.tmp
+  mv ~/.bash_profile.tmp ~/.bash_profile
+  echo "source ~/.my_bash_profile" >> ~/.bash_profile
+}
+call_linker() {
+  $(THIS_DIR)/linker
+}
+link_bash_profile
+fix_bash_profile
+call_linker
+
+exit
 
 echo -e "🛟 "
 
 echo "https://raw.githubusercontent.com/morganism/tools/refs/heads/master/message"
 curl "https://raw.githubusercontent.com/morganism/tools/refs/heads/master/message"
+
 

@@ -1,7 +1,7 @@
 THIS="$(realpath $BASH_SOURCE)"
 DIR="$(dirname $THIS)"
 
-LIB_COLOURS=".ansi_colours.env"
+LIB_COLOURS=".ansi.functions"
 [[ -f "${DIR}/${LIB_COLOURS}" ]] && source "${DIR}/${LIB_COLOURS}"
 
 alias dcud='docker compose up -d'
@@ -14,20 +14,17 @@ alias ipr='netstat -nr'                   # `ip r` → routing table
 alias ipn='networksetup -listallhardwareports'  # shows interface names and MACs
 alias awsprofile='source ~/bin/_awsconsole'
 alias awssel='export AWS_PROFILE=$(cat ~/.config/aws/selected_profile)' 
-alias sbp='source ~/.bash_profile'
-alias vbp="vi ~/.bash_profile && echo -e \"\n\n ${IRed}Remember ${Red}source bash profile! ${White}sbp ${NC}\n\n\""
+alias sbp='source ~/.bash_profile && source ~/.my_bash_profile'
+alias vbp="vi ~/.my_bash_profile && echo -e \"\n\n ${IRed}Remember ${Red}source *my* bash profile !${Reset} [${IBlack}~/.my_bash_profile${Reset}] ${IWhite}sbp ${Reset}\n\n\""
 alias vma='vi_my_aliases'
 alias vmf='vi_my_functions'
 alias smf='source ~/.my_functions'
 alias sma='source ~/.my_aliases'
 alias vbrc='vi ~/.bashrc && source ~/.bashrc'
-alias cds='cd ~ && pushd ~/src/scalpelltd'
 alias cdm='cd ~ && pushd ~/src/morganism'
 alias tools='pushd ~/src/morganism/tools'
 alias ggu='git config --local --get remote.origin.url' # ggu == git get url : the url that you clone
 alias runvnc="vncserver -xstartup $HOME/bin/xstartup"
-#good tag
-alias werty='echo "werty"'
 alias ghowner='gh auth status|grep Logged|sed -e '\''s:^.*account ::'\'' -e '\''s: .*$::'\'''
 alias goaws='select_aws_profile.sh && awssel'
 # from deleted ~/.aws_aliases

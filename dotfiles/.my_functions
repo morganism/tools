@@ -5,9 +5,9 @@ ansi() {
 export MY_FUNCTIONS_SOURCE_DATE=$(date)
 check_source_date() {
   ansi
-  echo -e "${White}0: ${uWhite}$MY_FUNCTIONS_SOURCE_DATE"
+  echo -e "${White}0 source on: ${uWhite}$MY_FUNCTIONS_SOURCE_DATE"
   echo ""
-  echo -e "${White}1: ${uWhite}$(date)${Reset}"
+  echo -e "${White}1 date now : ${uWhite}$(date)${Reset}"
 }
 THIS_PATH() {
   # return absolute path to the script where THIS_PATH is called from
