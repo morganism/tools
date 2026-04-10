@@ -393,4 +393,10 @@ hex2dec() {
   printf '%d' $HEX;
 }
 dec2hex() { printf '%x' $1; }
+mogz_validate() {
+  CODE=$1
+  [[ -z "$CODE" ]] && read -p "Enter Authenticator Code for Mogz : " CODE 
+  ruby /Users/morgan/data/src/morganism/totp/totp.rb --secret HBTWGWHPDAUPSZOZACQ3CD57UBWOZE5A --validate $CODE 2>&1 > /dev/null
+  return $?
+}
 
