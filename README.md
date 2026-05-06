@@ -13,28 +13,5 @@ Check out the [Wiki](https://github.com/morganism/tools/wiki) !
 ## Tooling, scripts, utils 
 
 
-some
-
-words
-
-that
-
-take
-
-up
-
-some
-
-lines
-
-on
-
-the
-
-page
-
-
-
-## wonky. donkey, honky!
 
 
