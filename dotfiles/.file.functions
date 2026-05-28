@@ -1,3 +1,6 @@
+.file.functions() {
+  grep '()'  $BASH_SOURCE |  grep -v ".file.functions" | grep -v grep 
+}
 rmfile() {
    [[ -e "~/.ansi.functions" ]] && source ~/.ansi.functions
 

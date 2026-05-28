@@ -1,3 +1,7 @@
+.ansi.functions() {
+  grep '()'  $BASH_SOURCE |  grep -v ".ansi.functions" | grep -v grep 
+}
+
 THIS="$(realpath $BASH_SOURCE)"
 DIR="$(dirname $THIS)"
  

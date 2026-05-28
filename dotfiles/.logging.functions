@@ -1,5 +1,8 @@
 #!/bin/bash
 
+.logger.functions() {
+  grep '()'  $BASH_SOURCE |  grep -v ".logger.functions" | grep -v grep 
+}
 THIS="$(realpath $BASH_SOURCE)"
 DIR="$(dirname $THIS)"
 

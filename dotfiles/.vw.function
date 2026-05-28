@@ -1,4 +1,7 @@
 # 'vi which' edit the file or function that implements the command
+.vw.functions() {
+  grep '()'  $BASH_SOURCE |  grep -v ".vw.functions" | grep -v grep 
+}
 vw() {
   echo "$BASH_SOURCE"
 

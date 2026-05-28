@@ -1,4 +1,7 @@
 #!/bin/bash
+.shelper.functions() {
+  grep '()'  $BASH_SOURCE |  grep -v ".shelper.functions" | grep -v grep 
+}
 
 THIS="$(realpath $BASH_SOURCE)"
 DIR="$(dirname $THIS)"

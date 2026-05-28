@@ -1,4 +1,7 @@
 #18446744073709551615 largest dec
+.my_functions() {
+  grep '()'  $BASH_SOURCE |  grep -v ".my_functions" | grep -v grep 
+}
 ansi() {
   [[ -f ~/.ansi.functions ]] && source ~/.ansi.functions
 }
