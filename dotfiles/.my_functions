@@ -396,3 +396,13 @@ dec2hex() { printf '%x' $1; }
 ls_link() {
   readlink `which $1` || which $1
 }
+pip() {
+  if [[ "$1" =~ install ]]; then
+    if [[ -n "$2" ]]; then
+      brew install "$2"
+    else
+      echo "Install what ?"
+      return 127
+    fi
+  fi
+}

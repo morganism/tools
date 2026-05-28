@@ -1,3 +1,4 @@
+source ~/bin/.env
 declare -f > /tmp/declare-f
 dircolors() {
   # ~/.dircolors/themefile
@@ -22,6 +23,15 @@ source ~/.bin/.functions
 source ~/.my_aliases
 source ~/.my_functions
 source ~/.my_secrets
+
+source /Users/morgan/.ansi.functions
+source /Users/morgan/.datetime.functions
+source /Users/morgan/.file.functions
+source /Users/morgan/.include.function
+source /Users/morgan/.logging.functions
+source /Users/morgan/.shelper.functions
+source /Users/morgan/.unicode.functions
+source /Users/morgan/.vw.function
 source ~/.shelper.functions
 
 # Added by `rbenv init` on Sat  9 Aug 2025 22:43:51 BST
@@ -198,7 +208,9 @@ ANTHROPIC_BETA="anthropic-beta: $BETA_FEATURE_NAME"
 
 export XDG_CONFIG_HOME="~/.config"
 
-export PATH="/Users/morgan/.rvm/bin/:/Users/morgan/.rvm/gems/ruby-3.2.2:/Users/morgan/bin:/usr/local/bin:/bin:/sbin/:/usr/sbin/:/usr/bin/:$PATH"
+export PATH="/Users/morgan/bin:/usr/local/bin:/bin:/sbin/:/usr/sbin/:/usr/bin/:$PATH"
+export PATH2="$(uniqpath)"
+touch ~/XXXXXXXXXXXX
 
 : <<DOCRUBY
 
@@ -213,10 +225,12 @@ For pkgconf to find ruby@3.4 you may need to set:
   export PKG_CONFIG_PATH="/usr/local/opt/ruby@3.4/lib/pkgconfig"
 DOCRUBY
 
-[[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm" # Load RVM into a shell session *as a function*
 
 function iterm2_print_user_vars() {
   iterm2_set_user_var iterm_status_bar "$ITERM_STATUS_BAR"
 }
 
 [[ -n "${TOKENS_DIR}" ]] && export GH_TOKEN="$(cat ${TOKENS_DIR}/GH_SCALPEL_MAC)"
+
+export PATH="$HOME/.rbenv/bin:$PATH"
+eval "$(rbenv init - bash)"
