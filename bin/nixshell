@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+: <<DOCXX
+Throwaway shell with any tool, gone when you exit
+Author: morgan@morganism.dev
+Date: Mon 11 May 2026 21:50:49 BST
+
+
+# Throwaway shell with any tool, gone when you exit
+nix shell nixpkgs#ripgrep nixpkgs#fd nixpkgs#jq
+
+# Search for packages
+nix search nixpkgs ruby
+
+# Show what a flake exposes
+nix flake show nixpkgs
+DOCXX
+
+# Throwaway shell with any tool, gone when you exit
+nix shell nixpkgs#ripgrep nixpkgs#fd nixpkgs#jq
+
+

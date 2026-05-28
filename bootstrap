@@ -1,14 +1,13 @@
 #!/usr/bin/env bash
 
 THIS_PATH() {
-  # return absolute path to the script where THIS_PATH is called from
-    realpath "${BASH_SOURCE[1]}"
+    realpath "${BASH_SOURCE[1]}" # return absolute path to the script where THIS_PATH is called from
 }
 THIS_DIR() {
-    dirname "$(realpath "${BASH_SOURCE[1]}")"
+  dirname "$(THIS_PATH)"
 }
 THIS_FILE() {
-    basename "$(realpath "${BASH_SOURCE[1]}")"
+  basename "$(THIS_PATH)"
 }
 
 

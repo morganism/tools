@@ -1,0 +1,102 @@
+#!/usr/bin/env bash
+: <<DOCXX
+Add description
+Author: morgan@morganism.dev
+Date: Fri 10 Apr 2026 18:10:32 BST
+DOCXX
+ #!/usr/bin/env bash
+set -euo pipefail
+
+ENV_FILE=".env"
+
+# --- Load .env ---------------------------------------------------------------
+if [[ ! -f "$ENV_FILE" ]]; then
+  echo "❌ .env file not found. Expected TOKEN_DIR to be defined."
+  exit 1
+fi
+
+# shellcheck disable=SC1090
+source "$ENV_FILE"
+
+if [[ -z "${TOKEN_DIR:-}" ]]; then
+  echo "❌ TOKEN_DIR is not set in .env"
+  exit 1
+fi
+
+mkdir -p "$TOKEN_DIR"
+TOKEN_FILE="$TOKEN_DIR/GH_TOKEN"
+
+# --- If GH_TOKEN already set -------------------------------------------------
+if [[ -n "${GH_TOKEN:-}" ]]; then
+  echo "✅ GH_TOKEN already set in environment"
+  exit 0
+fi
+
+# --- If token file exists ----------------------------------------------------
+if [[ -f "$TOKEN_FILE" ]]; then
+  export GH_TOKEN
+  GH_TOKEN="$(<"$TOKEN_FILE")"
+  echo "✅ GH_TOKEN loaded from $TOKEN_FILE"
+  exit 0
+fi
+
+echo "⚠️  GH_TOKEN is not set."
+
+echo
+echo "Choose an option:"
+echo "  1) Paste an existing GitHub token"
+echo "  2) Create a new token via GitHub API (requires gh CLI)"
+echo
+
+read -rp "Select [1/2]: " choice
+
+case "$choice" in
+  1)
+    read -rsp "Paste GH_TOKEN: " GH_TOKEN
+    echo
+    ;;
+  2)
+    if ! command -v gh >/dev/null 2>&1; then
+      echo "❌ gh CLI not found. Install from https://cli.github.com/"
+      exit 1
+    fi
+
+    if ! gh auth status >/dev/null 2>&1; then
+      echo "❌ gh is not authenticated. Run: gh auth login"
+      exit 1
+    fi
+
+    echo "🔐 Creating GitHub token via API..."
+
+    GH_TOKEN="$(
+      gh api \
+        --method POST \
+        -H "Accept: application/vnd.github+json" \
+        /authorizations \
+        -f note="auto-generated-gh-token" \
+        -f scopes[]="repo" \
+        -f scopes[]="read:org" \
+        -f scopes[]="workflow" \
+        --jq '.token'
+    )"
+
+    if [[ -z "$GH_TOKEN" || "$GH_TOKEN" == "null" ]]; then
+      echo "❌ Failed to create token"
+      exit 1
+    fi
+    ;;
+  *)
+    echo "❌ Invalid choice"
+    exit 1
+    ;;
+esac
+
+# --- Persist token -----------------------------------------------------------
+umask 077
+printf '%s\n' "$GH_TOKEN" > "$TOKEN_FILE"
+
+export GH_TOKEN
+
+echo "✅ GH_TOKEN saved to $TOKEN_FILE"
+echo "✅ GH_TOKEN exported to environment"
+
