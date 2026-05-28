@@ -1,0 +1,39 @@
+rmfile() {
+   [[ -e "~/.ansi.functions" ]] && source ~/.ansi.functions
+
+   QUIET="N"
+   FILES=("$@")
+   DELETE_ALL="N"
+   for FILE in "${FILES[@]}";
+      do
+          ANSWER="n"
+          if [[ "$FILE" =~ ^- ]]; then # option
+              [[ "$FILE" =~ -q ]] && QUIET="Y"
+              [[ "$FILE" =~ -y ]] && DELETE_ALL="Y"
+              continue
+          fi
+          if [[ ! -e "$FILE" ]] && [[ "$DELETE_ALL" =~ N ]]; then
+              echo -e "${Red}File${Reset} ${IWhite}$FILE${Reset} ${Red}does not exist.${Reset}" && continue
+          fi
+          if [[ "$DELETE_ALL" =~ "N" ]]; then
+              echo -e "${Yellow}Delete${Reset} ${IYellow}${FILE}${Reset} ${Purple}[${IWhite}a${IBlack}ll${Purple}]${Reset} ${Purple}[${IWhite}y${IBlack}es${Purple}]${Reset} ${Purple}[${IWhite}n${IBlack}o${Purple}]${Reset} ${Purple}[${IWhite}q${IBlack}uit${Purple}]${Reset} ?"
+              read -t 3 -n 1 -s ANSWER
+          fi
+          [[ "$ANSWER" =~ ^$ ]] && echo -e "${Blue}No answer provided.${Reset}"
+          if [[ "$ANSWER" =~ n ]]; then
+              [[ "$QUIET" =~ N ]] && echo -e "${Green}Skipping${Reset} ${IGreen}$FILE${Reset}"
+              continue
+          fi
+          [[ "$ANSWER" =~ q ]] && return 0
+          [[ "$ANSWER" =~ a ]] && DELETE_ALL="Y"
+
+          if [[ "$ANSWER" =~ y ]] || [[ "$DELETE_ALL" =~ Y ]]; then
+              rm $FILE
+          fi
+      done
+  
+
+}
+rmf() {
+   rmfile  "$@"
+}
