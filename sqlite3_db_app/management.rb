@@ -1,3 +1,5 @@
+#!/usr/bin/env ruby
+#
 # frozen_string_literal: true
 
 # management.rb — Generic SQLite3 table manager

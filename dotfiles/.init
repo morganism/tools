@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+: <<DOCXX
+A Global initialisation file
+Author: 
+Date: Sat  6 Jun 23:50:56 BST 2026
+DOCXX
+
+ANSI_FUNCTIONS="${HOME}/.ansi.functions"
+[[ -e $ANSI_FUNCTIONS ]] && source $ANSI_FUNCTIONS
+
+
+declare -i RETRY_MAX=3
+declare -i RETRY_CNT=0
+
+DEFAULT_SOURCE_DIRECTORY="${HOME}/src/${USER}"
+TOOLS_SOURCE_DIR="${DEFAULT_SOURCE_DIRECTORY}/tools"
+LINKER_FILE="${TOOLS_SOURCE_DIR}/linker"
+initLinker() {
+	(( $RETRY_CNT += 1 ))
+	(( $RETRY_CNT > $RETRY_MAX )) && return 127
+	if [[ -e $LINKER_FILE ]]; then
+		echo -e "${Green}Found Linker [${OnWhite}${LINKER_FILE}${Green}].${Reset}"
+		echo -e "${Green}Linking attempt: # ${RETRY_CNT}${Reset}"
+		$LINKER_FILE && echo -e "${IGreen}${On_White}OK${Reset}" || echo -e "${IRed}${On_White}Fail${Reset}"
+	else
+		echo -e "${Red}${On_Yellow}WARN${Reset}: ${dRed}${On_Grey_4}Linker not found.${Reset}"
+		echo -e "${dWhite}Linking${Reset}"
+		[[ -e $LINKER_FILE ]] && ln -s $LINKER_FILE $HOME/bin/linker && init
+	fi
+}
+initLinker
+
+
+for f in $(ls -1 ~/.my*)
+do
+	source $f
+done
+for f in $(ls -1 ~/.*.function*)
+do
+	source $f
+done
