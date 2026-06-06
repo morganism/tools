@@ -21,7 +21,9 @@ alias vmf='vi_my_functions'
 alias smf='source ~/.my_functions'
 alias sma='source ~/.my_aliases'
 alias vbrc='vi ~/.bashrc && source ~/.bashrc'
-alias cdm='cd ~ && pushd ~/src/morganism'
+alias cdm='pushd ~/src/morganism'
+alias cds='pushd ~/src'
+alias cdt='pushd /tmp/'
 alias tools='pushd ~/src/morganism/tools'
 alias ggu='git config --local --get remote.origin.url' # ggu == git get url : the url that you clone
 alias runvnc="vncserver -xstartup $HOME/bin/xstartup"
@@ -41,6 +43,13 @@ alias gits='git status'
 alias disablewebcam='sudo modprobe -r uvcvideo'
 alias gitadder="git status | grep modified | sed -e 's/^.modified:   //' | tee >(xargs git add)"
 alias gitstaged="git status --short | grep '^M[ M] ' | sed -e 's/^...//'"
-alias gitnotstaged="git status --short | grep '^[ M]M ' | sed -e 's/^...//'"
+alias gitnotstaged="git status --short | grep '^[ M]M ' | sed -e 's/^...//' | tr '\n' ' '"
+alias gitaddnotstaged="gitnotstaged && echo -e \"${Yellow}In 3s ...${Reset}\" && for i in \"$(gitnotstaged)\"; do echo \"git add $i\"; git add $i; done"
 alias gitadded="git status --short | grep '^MM ' | sed -e 's:^MM *::'"
 alias gitnotadded="git status --short | grep '^M ' | sed -e 's:^M *::'"
+alias shutdown="sudo shutdown -r now"
+alias cv='pushd ~/src/morganism/cv'
+alias uuidgen3=uuidgen
+alias accesstoken='curl --request POST "https://auth.id.trade-tariff.service.gov.uk/oauth2/token" \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  -d "grant_type=client_credentials&client_id=3voa8r5jfdt5sqv41es64jn8f2&client_secret=14d4t51v211j8s20ppv984sd2i90js4fs985vujo6v73qg7jo9h5"'
