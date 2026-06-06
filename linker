@@ -2,13 +2,48 @@
 #
 # i make a symlink for each file in ./bin to $HOME/bin
 #
-[[ -f ~/.ansi.functions ]] && source ~/.ansi.functions #&& echo "Yes"
-[[ -L ~/.ansi.functions ]] && source ~/.ansi.functions #&& echo "YesL"
+[[ -f $HOME/.ansi.functions ]] && source $HOME/.ansi.functions # if a file
+[[ -L $HOME/.ansi.functions ]] && source $HOME/.ansi.functions # if a link
 
 HOME_BIN="$HOME/bin"         # the bin dir
 THIS=$(realpath $BASH_SOURCE)
 THIS_FILE=$(basename $THIS)
 TOOLS_DIR=$(dirname $THIS)
+
+ensureProfileIsSourced() {
+	echo -e "${Blue}${On_Grey_4}Ensuring that${Reset} "
+	echo -e " ${IWhite}-${Reset} ${RBlue}$HOME/.profile${Reset} "
+	echo -e " ${IWhite}-${Reset} ${RBlue}$HOME/.bashrc${Reset} "
+	echo -e " ${IWhite}-${Reset} ${RBlue}$HOME/.bash_profile${Reset} "
+	echo -e " ${Blue}${On_Grey_4}Are correctly sourced.${Reset}"
+
+	PROFILE="In this order /etc/profile ${HOME}/.bash_profile, ${HOME}/.bash_login, ${HOME}/.profile"
+	if [[ -e $HOME/.bash_profile ]]; then
+		PROFILE="$HOME/.bash_profile"
+	elif [[ -e $HOME/.bash_login ]]; then
+		PROFILE="$HOME/.bash_login"
+	elif [[ -e $HOME/.profile ]]; then
+		PROFILE="$HOME/.profile"
+	elif [[ -e $HOME/.bashrc ]]; then
+		PROFILE="$HOME/.bashrc"
+	else
+		echo -e "${IRed}${On_Grey_4}WTF! No profile found!${Reset}"
+	fi
+
+	MY_BASH_BROFILE="$HOME/.my_bash_profile"
+	if [[ -e $MY_BASH_BROFILE ]]; then
+		if [[ $(grep -c "source $MY_BASH_BROFILE" $PROFILE) =~ 0 ]]; then
+			echo -e "${Purple}${On_Grey_4}Linking ${MY_BASH_BROFILE}${Reset}"
+			echo "source $MY_BASH_BROFILE" >> $PROFILE
+			echo -e "${Green}${On_Grey_4}Added this: 'source $MY_BASH_BROFILE' to $PROFILE${Reset}"
+		else
+			echo -e "${Green}${On_Grey_4}Link present in ${PROFILE}${Reset}"
+		fi
+		source $PROFILE
+	else
+		echo -e "${Red}${On_Grey_4}Oops! $MY_BASH_BROFILE is not linked.${Reset}"
+	fi
+}
 
 usage() {
   echo -e "${IWhite}Usage: ${White}${THIS_FILE}${Reset} ${IBlack}[-D]${Reset}"
@@ -71,3 +106,4 @@ do
     fi
   fi
 done
+ensureProfileIsSourced

@@ -1,4 +1,3 @@
-source ~/bin/.env
 declare -f > /tmp/declare-f
 dircolors() {
   # ~/.dircolors/themefile
@@ -16,14 +15,12 @@ export COLORTERM=truecolor
 #[[ -f "${HOME}/Library/Application Support/amazon-q/shell/bash_profile.pre.bash" ]] && builtin source "${HOME}/Library/Application Support/amazon-q/shell/bash_profile.pre.bash"
 ## Amazon Q pre block. Keep at the top of this file.
 #[[ -f "${HOME}/Library/Application Support/amazon-q/shell/bashrc.pre.bash" ]] && builtin source "${HOME}/Library/Application Support/amazon-q/shell/bashrc.pre.bash"
-source /Users/morgan/.javarc
 
 set -o vi
-source ~/.bin/.functions
-source ~/.my_aliases
-source ~/.my_functions
-source ~/.my_secrets
-source ~/.vw.function
+[[ -e ~/.my_aliases ]] && source ~/.my_aliases
+[[ -e ~/.my_functions ]] && source ~/.my_functions
+[[ -e ~/.my_secrets ]] && source ~/.my_secrets
+[[ -e ~/.vw.function ]] && source ~/.vw.function
 
 #source /Users/morgan/.ansi.functions
 #source /Users/morgan/.datetime.functions
