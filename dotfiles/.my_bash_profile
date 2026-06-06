@@ -23,16 +23,17 @@ source ~/.bin/.functions
 source ~/.my_aliases
 source ~/.my_functions
 source ~/.my_secrets
+source ~/.vw.function
 
-source /Users/morgan/.ansi.functions
-source /Users/morgan/.datetime.functions
-source /Users/morgan/.file.functions
-source /Users/morgan/.include.function
-source /Users/morgan/.logging.functions
-source /Users/morgan/.shelper.functions
-source /Users/morgan/.unicode.functions
-source /Users/morgan/.vw.function
-source ~/.shelper.functions
+#source /Users/morgan/.ansi.functions
+#source /Users/morgan/.datetime.functions
+#source /Users/morgan/.file.functions
+#source /Users/morgan/.include.function
+#source /Users/morgan/.logging.functions
+#source /Users/morgan/.shelper.functions
+#source /Users/morgan/.unicode.functions
+#source /Users/morgan/.vw.function
+#source ~/.shelper.functions
 
 # Added by `rbenv init` on Sat  9 Aug 2025 22:43:51 BST
 #eval "$(rbenv init - --no-rehash bash)"
