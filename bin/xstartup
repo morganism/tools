@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+: <<DOCXX
+Add description
+Author: 
+Date: Wed 15 Oct 15:12:17 BST 2025
+DOCXX
+
+xrdb $HOME/.Xresources
+startxfce4 &

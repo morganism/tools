@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+: <<DOCXX
+Add description
+Author: 
+Date: Wed 15 Oct 16:35:33 BST 2025
+DOCXX
+
+source ~/.ansi.colours.env
+
+cd ~/src/morganism/tools
+./linker
+echo -e "${Blue}Done${NC}"

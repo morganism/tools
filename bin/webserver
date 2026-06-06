@@ -1,0 +1,85 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require 'sinatra'
+require 'sinatra/reloader' if development?
+require 'find'
+require 'erb'
+
+set :bind, '0.0.0.0'
+set :port, 4567
+
+# Use current directory as the root for images
+ROOT_DIR = Dir.pwd
+
+# Route for main page
+get '/' do
+  @images = []
+  Find.find(ROOT_DIR) do |path|
+    next unless path.downcase.end_with?('.png')
+    # Convert absolute path to relative path for serving
+    rel_path = path.sub(/^#{Regexp.escape(ROOT_DIR)}\/?/, '')
+    @images << { rel: rel_path, abs: path }
+  end
+  erb :index
+end
+
+# Serve static files (images)
+set :public_folder, ROOT_DIR
+
+__END__
+
+@@ layout
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Image Browser</title>
+    <style>
+      body { font-family: sans-serif; padding: 20px; }
+      .gallery { display: flex; flex-wrap: wrap; gap: 10px; }
+      .thumb { display: flex; flex-direction: column; align-items: center; }
+      img { width: 150px; height: auto; border: 1px solid #ccc; border-radius: 4px; }
+      .controls { margin: 20px 0; }
+      button { padding: 8px 12px; font-size: 14px; }
+    </style>
+  </head>
+  <body>
+    <%= yield %>
+  </body>
+</html>
+
+@@ index
+<h1>PNG Image Browser</h1>
+
+<form id="imageForm">
+  <div class="gallery">
+    <% @images.each do |img| %>
+      <div class="thumb">
+        <img src="<%= img[:rel] %>" alt="<%= File.basename(img[:rel]) %>">
+        <label>
+          <input type="checkbox" name="selected" value="<%= img[:abs] %>">
+          Select
+        </label>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="controls">
+    <button type="button" onclick="showSelected()">Show Selected Paths</button>
+  </div>
+</form>
+
+<script>
+function showSelected() {
+  const selected = Array.from(document.querySelectorAll('input[name="selected"]:checked'))
+    .map(cb => cb.value)
+    .join('\\n');
+  if (selected) {
+    alert(selected);
+  } else {
+    alert('No images selected.');
+  }
+}
+</script>
+

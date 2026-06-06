@@ -1,0 +1,67 @@
+#!/usr/bin/env bash
+: <<DOCXX
+Add description
+Author: 
+Date: Wed 15 Oct 16:20:54 BST 2025
+DOCXX
+
+
+
+refresh() {
+  # as your user (try first)
+  vncserver -list
+  vncserver -kill :1 2>/dev/null || true
+  
+  # double-check with ps
+  ps aux | egrep '(Xtigervnc|Xvnc|Xorg).*:1' || true
+}  
+
+rmstale() {
+  sudo rm -f /tmp/.X1-lock /tmp/.X11-unix/X1
+  # also remove stale pid files in your .vnc dir (only pid files)
+  rm -f ~/.vnc/*:1.pid
+}
+
+presudo() {
+ sudo :
+}
+
+sanity() {
+# ensure correct content and executable
+cat > ~/.vnc/xstartup <<'EOF'
+  #!/bin/sh
+  xrdb $HOME/.Xresources
+  startxfce4 &
+EOF
+
+  chmod +x ~/.vnc/xstartup
+}
+
+relode() {
+  sudo systemctl daemon-reload
+  sudo systemctl restart vncserver@:1
+  # stream the unit logs (shows immediate failure reason)
+  sudo journalctl -u vncserver@:1 -n 200 --no-pager
+}
+
+usage() {
+  echo -e "
+}
+
+presudo
+all() {
+  presudo
+  refresh
+  rmstale
+  sanity
+  relode
+}
+
+[[ "$1" =~ ^a ]] && all
+[[ "$1" =~ ^u ]] && usage
+[[ "$1" =~ ^p ]] && presudo
+[[ "$1" =~ ^ref ]] && refresh
+[[ "$1" =~ ^rm ]] && rmstale
+[[ "$1" =~ ^s ]] && sanity
+[[ "$1" =~ ^rel ]] && relode
+
