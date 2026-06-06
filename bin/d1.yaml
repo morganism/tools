@@ -1,0 +1,11 @@
+prompt: "Enter confirmation phrase"
+type: inputbox
+timeout: 15
+default: "ABORT"
+input:
+  strict_phrase: "DELETE ALL"
+
+prompt: "Enter tailbox phrase"
+type: tailbox
+timeout: 15
+default: "y"

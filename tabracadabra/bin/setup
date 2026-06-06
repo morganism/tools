@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+: <<DOCXX
+Add description
+Author: morgan@morganism.dev
+Date: Fri  8 May 2026 14:10:06 BST
+DOCXX
+
+SUDO="/usr/bin/sudo"
+
+_sudo() {
+  $SUDO /bin/echo "sudo OK" || /bin/echo "Error: sudo"
+}
+
+apt_install_xdotool() {
+  $SUDO apt install xdotool
+}
+
+apt_install_wmctrl() {
+  $SUDO apt install wmctrl
+}
+
+apt_install_jq() {
+  $SUDO apt install jq
+}
+
+apt_install() {
+  _sudo                # isolate sudo ok
+  return 1
+  apt_install_xdotool
+  apt_install_wmctrl
+  apt_install_jq
+}
+
+apt_install
