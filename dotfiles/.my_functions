@@ -236,13 +236,9 @@ bindreset() {
 #
 # wrap 'git push' to set upstream if necessary
 git() {
-<<<<<<< Updated upstream
-  GIT_CMD="/usr/local/git/bin/git"
-
-=======
   GIT_FROM_TYPE=$(type -P git)
   GIT_CMD="${GIT_FROM_TYPE}"
->>>>>>> Stashed changes
+
   GIT_BRANCH=$($GIT_CMD branch -l | grep ^\* | sed -e 's:^\* ::')
   if [[ $1 = "push" ]] && [[ ! "$GIT_BRANCH" =~ master ]]; then
     ansi
