@@ -400,6 +400,7 @@ ls_link() {
   readlink `which $1` || which $1
 }
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 pip() {
   if [[ "$1" =~ install ]]; then
     if [[ -n "$2" ]]; then
@@ -489,6 +490,11 @@ EOF
   echo
   r=${r:-Y}
   [[ $r =~ ^[Yy]$ ]]
+=======
+port2pid() {
+  PORT=$1
+  sudo lsof -nP -iTCP:${PORT} -sTCP:LISTEN
+>>>>>>> Stashed changes
 =======
 port2pid() {
   PORT=$1

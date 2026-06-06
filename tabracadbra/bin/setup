@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+: <<DOCXX
+Description : Move Chrome tab to new window ¿ display
+Author      : morgan@morganism.dev
+Date        : Fri  8 May 13:27:21 BST 2026
+DOCXX
+
+setup() {
+	sudo apt install xdotool wmctrl jq
+}
+

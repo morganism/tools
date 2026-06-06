@@ -25,10 +25,13 @@ alias dev='source /Users/morgan/bin/_devprofile'
 # editing
 alias vbrc='vi ~/.bashrc && source ~/.bashrc'
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 alias cdm='pushd ~/src/morganism'
 alias cds='pushd ~/src'
 alias cdt='pushd /tmp/'
 =======
+=======
+>>>>>>> Stashed changes
 alias vma='vi_my_aliases'
 alias vmf='vi_my_functions'
 alias vbp="vi ~/.my_bash_profile && echo -e \"\n\n ${IRed}Remember ${Red}source *my* bash profile !${Reset} [${IBlack}~/.my_bash_profile${Reset}] ${IWhite}sbp ${Reset}\n\n\""
@@ -37,6 +40,9 @@ alias cds='pushd ~/src'
 alias cdm='pushd ~/src/morganism'
 alias cdt='pushd ~/src/morganism/tools'
 alias tmp='pushd ~/tmp'
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 alias tools='pushd ~/src/morganism/tools'
 alias runvnc="vncserver -xstartup $HOME/bin/xstartup"
