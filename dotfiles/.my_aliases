@@ -4,6 +4,8 @@ DIR="$(dirname $THIS)"
 LIB_COLOURS=".ansi.functions"
 [[ -f "${DIR}/${LIB_COLOURS}" ]] && source "${DIR}/${LIB_COLOURS}"
 
+alias ansi='source ~/.ansi.functions'
+alias init='source ~/.init
 alias dcud='docker compose up -d'
 alias ll='ls -liastr'
 alias ll2='ls -liastre@'
@@ -14,32 +16,43 @@ alias ipr='netstat -nr'                   # `ip r` → routing table
 alias ipn='networksetup -listallhardwareports'  # shows interface names and MACs
 alias awsprofile='source ~/bin/_awsconsole'
 alias awssel='export AWS_PROFILE=$(cat ~/.config/aws/selected_profile)' 
+# sourcing
 alias sbp='source ~/.bash_profile && source ~/.my_bash_profile'
-alias vbp="vi ~/.my_bash_profile && echo -e \"\n\n ${IRed}Remember ${Red}source *my* bash profile !${Reset} [${IBlack}~/.my_bash_profile${Reset}] ${IWhite}sbp ${Reset}\n\n\""
-alias vma='vi_my_aliases'
-alias vmf='vi_my_functions'
 alias smf='source ~/.my_functions'
 alias sma='source ~/.my_aliases'
+alias prod='source /Users/morgan/bin/_prodprofile'
+alias dev='source /Users/morgan/bin/_devprofile'
+# editing
 alias vbrc='vi ~/.bashrc && source ~/.bashrc'
+<<<<<<< Updated upstream
 alias cdm='pushd ~/src/morganism'
 alias cds='pushd ~/src'
 alias cdt='pushd /tmp/'
+=======
+alias vma='vi_my_aliases'
+alias vmf='vi_my_functions'
+alias vbp="vi ~/.my_bash_profile && echo -e \"\n\n ${IRed}Remember ${Red}source *my* bash profile !${Reset} [${IBlack}~/.my_bash_profile${Reset}] ${IWhite}sbp ${Reset}\n\n\""
+# cd to
+alias cds='pushd ~/src'
+alias cdm='pushd ~/src/morganism'
+alias cdt='pushd ~/src/morganism/tools'
+alias tmp='pushd ~/tmp'
+>>>>>>> Stashed changes
 alias tools='pushd ~/src/morganism/tools'
-alias ggu='git config --local --get remote.origin.url' # ggu == git get url : the url that you clone
 alias runvnc="vncserver -xstartup $HOME/bin/xstartup"
 alias ghowner='gh auth status|grep Logged|sed -e '\''s:^.*account ::'\'' -e '\''s: .*$::'\'''
 alias goaws='select_aws_profile.sh && awssel'
 # from deleted ~/.aws_aliases
-alias prod='source /Users/morgan/bin/_prodprofile'
-alias dev='source /Users/morgan/bin/_devprofile'
 alias downl='pushd ~/Downloads'
+# git
 alias gita='git add'
+alias gits='git status'
 alias gitc='git commit'
 alias gitcm='git commit -m '
 alias gitp='git push'
+alias ggu='git config --local --get remote.origin.url' # ggu == git get url : the url that you clone
 alias dg='doc_generator'
 alias thanksgiving='date -v1d -v+9m -v-1d -v-thu -j'
-alias gits='git status'
 alias disablewebcam='sudo modprobe -r uvcvideo'
 alias gitadder="git status | grep modified | sed -e 's/^.modified:   //' | tee >(xargs git add)"
 alias gitstaged="git status --short | grep '^M[ M] ' | sed -e 's/^...//'"
