@@ -245,7 +245,6 @@ git() {
     echo -e "${Blue}${On_White}wrap 'git push'${Reset}"
     if  [[ $($GIT_CMD push 2>&1| grep 'has no upstream') ]]; then
       echo $GIT_CMD push --set-upstream origin $GIT_BRANCH 
-      sleep 10
       $GIT_CMD push --set-upstream origin $GIT_BRANCH 
     fi
   else
