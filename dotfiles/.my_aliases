@@ -1,11 +1,5 @@
-THIS="$(realpath $BASH_SOURCE)"
-DIR="$(dirname $THIS)"
-
-LIB_COLOURS=".ansi.functions"
-[[ -f "${DIR}/${LIB_COLOURS}" ]] && source "${DIR}/${LIB_COLOURS}"
-
 alias ansi='source ~/.ansi.functions'
-alias init='source ~/.init
+alias init='source ~/.init'
 alias dcud='docker compose up -d'
 alias ll='ls -liastr'
 alias ll2='ls -liastre@'
@@ -15,6 +9,7 @@ alias ipa='ifconfig'                      # shorthand for `ip a`
 alias ipr='netstat -nr'                   # `ip r` → routing table
 alias ipn='networksetup -listallhardwareports'  # shows interface names and MACs
 alias awsprofile='source ~/bin/_awsconsole'
+
 alias awssel='export AWS_PROFILE=$(cat ~/.config/aws/selected_profile)' 
 # sourcing
 alias sbp='source ~/.bash_profile && source ~/.my_bash_profile'
