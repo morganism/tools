@@ -1,4 +1,3 @@
-alias ansi='source ~/.ansi.functions'
 alias init='source ~/.init'
 alias dcud='docker compose up -d'
 alias ll='ls -liastr'
@@ -36,22 +35,22 @@ alias ghowner='gh auth status|grep Logged|sed -e '\''s:^.*account ::'\'' -e '\''
 alias goaws='select_aws_profile.sh && awssel'
 # from deleted ~/.aws_aliases
 alias downl='pushd ~/Downloads'
-# git
-alias gita='git add'
-alias gits='git status'
-alias gitc='git commit'
-alias gitcm='git commit -m '
-alias gitp='git push'
-alias ggu='git config --local --get remote.origin.url' # ggu == git get url : the url that you clone
+## git
+#alias gita='git add'
+#alias gits='git status'
+#alias gitc='git commit'
+#alias gitcm='git commit -m '
+#alias gitp='git push'
+#alias ggu='git config --local --get remote.origin.url' # ggu == git get url : the url that you clone
 alias dg='doc_generator'
 alias thanksgiving='date -v1d -v+9m -v-1d -v-thu -j'
 alias disablewebcam='sudo modprobe -r uvcvideo'
-alias gitadder="git status | grep modified | sed -e 's/^.modified:   //' | tee >(xargs git add)"
-alias gitstaged="git status --short | grep '^M[ M] ' | sed -e 's/^...//'"
-alias gitnotstaged="git status --short | grep '^[ M]M ' | sed -e 's/^...//' | tr '\n' ' '"
-alias gitaddnotstaged="gitnotstaged && echo -e \"${Yellow}In 3s ...${Reset}\" && for i in \"$(gitnotstaged)\"; do echo \"git add $i\"; git add $i; done"
-alias gitadded="git status --short | grep '^MM ' | sed -e 's:^MM *::'"
-alias gitnotadded="git status --short | grep '^M ' | sed -e 's:^M *::'"
+#alias gitadder="git status | grep modified | sed -e 's/^.modified:   //' | tee >(xargs git add)"
+#alias gitstaged="git status --short | grep '^M[ M] ' | sed -e 's/^...//'"
+#alias gitnotstaged="git status --short | grep '^[ M]M ' | sed -e 's/^...//' | tr '\n' ' '"
+#alias gitaddnotstaged="gitnotstaged && echo -e \"${Yellow}In 3s ...${Reset}\" && for i in \"$(gitnotstaged)\"; do echo \"git add $i\"; git add $i; done"
+#alias gitadded="git status --short | grep '^MM ' | sed -e 's:^MM *::'"
+#alias gitnotadded="git status --short | grep '^M ' | sed -e 's:^M *::'"
 alias shutdown="sudo shutdown -r now"
 alias cv='pushd ~/src/morganism/cv'
 alias uuidgen3=uuidgen
