@@ -9,7 +9,7 @@ usage() {
 D=$1
 
 if [[ ! -e $D ]]; then
-  $TEMPFILE="/tmp/mcd.`date +%s`.tmp"
+  TEMPFILE="/tmp/mcd.`date +%s`.tmp"
   echo "mkdir -p ${D}" > $TEMPFILE
   source $TEMPFILE
   rm $TEMPFILE
