@@ -54,3 +54,6 @@ alias disablewebcam='sudo modprobe -r uvcvideo'
 alias shutdown="sudo shutdown -r now"
 alias cv='pushd ~/src/morganism/cv'
 alias uuidgen3=uuidgen
+alias awsp='[[ -f "$HOME/bin/aws-profile-select.sh" ]] \
+  && source "$HOME/bin/aws-profile-select.sh" \
+  || printf "\033[0;31mFile [%s] not found.\033[0m\n" "$HOME/bin/aws-profile-select.sh"'
