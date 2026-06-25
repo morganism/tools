@@ -58,3 +58,4 @@ alias awsp='[[ -f "$HOME/bin/aws-profile-select.sh" ]] \
   && source "$HOME/bin/aws-profile-select.sh" \
   || printf "\033[0;31mFile [%s] not found.\033[0m\n" "$HOME/bin/aws-profile-select.sh"'
 alias awsexp='aws configure export-credentials --profile 844815912454_TariffAdministratorAccess --format env'
+alias j='z'

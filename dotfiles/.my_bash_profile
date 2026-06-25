@@ -169,10 +169,9 @@ export PS1='\[\]\H:\W \u\$ \[\]\[\]'
     #source "/Users/morgan/.config/dirhook/dirhook.sh"
 #fi
 
-#if command -v zoxide &>/dev/null; then
-  #eval "$(zoxide init bash)"
-#fi
-#
+if command -v zoxide &>/dev/null; then
+  eval "$(zoxide init bash --cmd j)"
+fi
 
 # if this is an interactive shell session
 if [[ $- == *i* ]]; then

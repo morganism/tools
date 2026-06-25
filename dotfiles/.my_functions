@@ -421,3 +421,64 @@ port2pid() {
   PORT=$1
   sudo lsof -nP -iTCP:${PORT} -sTCP:LISTEN
 }
+cprp() {
+  ansi
+  FILE=$1
+  if [[ -z "$FILE" ]]; then
+    echo -e "${Red}Usage: ${White}cprp ${Grey_8}FILE${Reset}"
+    return 127
+  elif [[ -e $FILE ]]; then
+    echo -e "${Green}realpath to [$FILE] in clipboard${Reset}"
+    realpath $1 | pbcopy
+  else
+    echo -e "${Red}File: [$FILE] not found${Reset}"
+    return 128
+  fi
+}
+cpcat() {
+  # copy cat ;-)
+  ansi
+  FILE=$1
+  if [[ -z "$FILE" ]]; then
+    echo -e "${Red}Usage: ${White}cpcat ${Grey_8}FILE${Reset}"
+    echo -e "${White}     Copy the contents of textfile $FILE to clipboard.{Reset}"
+    return 127
+  elif [[ -e $FILE ]]; then
+    echo -e "${Green}Contents of [$FILE] in clipboard${Reset}"
+    cat $1 | pbcopy
+  else
+    echo -e "${Red}File: [$FILE] not found${Reset}"
+    return 128
+  fi
+}
+gitrepos() {
+  ansi
+  [[ -z $1 ]] && echo -e "${Red}Usage: gitrepos VARNAME\n set VARNAME to list of repo directories${Reset}"
+  local ref_name=$1
+  declare -n ref="$ref_name"
+  ref=$(find . -type d -name '.git' -exec dirname {} \;)
+}
+gitpull-r() {
+  gitrepos REPOS
+
+  ORIGINAL_DIR=$(pwd)
+  for r in $REPOS
+  do
+    RP=$(realpath $r)
+    echo $RP
+    cd $RP
+    git pull
+    cd $ORIGINAL_DIR
+  done
+}
+fdir() {
+  ansi
+  usage() {
+    echo -e "${Red}Usage:${Reset} ${uRed}fdir${Reset} ${Red}DIRECTORY_NAME${Reset}"
+    echo -e "${Red}       Search for subdirectories named DIRECTORY_NAME${Reset}"
+    return 127
+  }
+  [[ -z $1 ]] && usage
+
+  find -E . -type d -regex ".*/${1}"
+}
