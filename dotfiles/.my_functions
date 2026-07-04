@@ -504,7 +504,7 @@ bootstrap() {
   BOOTSTRAP_URL="https://raw.githubusercontent.com/morganism/${REPO}/master/bootstrap.sh"
 
   if curl -fsI "$BOOTSTRAP_URL" >/dev/null; then
-    echo -e "${Green}Found Bootstrapper: ${IGreen}bootstrap.sh${Green} running ...${Reset}"
+    echo -e "${Green}Found Bootstrapper: ${IGreen}bootstrap.sh${Green} in repo '${REPO}' ... running ...${Reset}"
     curl -fsSL "$BOOTSTRAP_URL" | bash
   else
     echo -e "${Red}Bootstrapper: ${IRed}bootstrap.sh${Red} not found — ${RRed}aborting${Reset}"
