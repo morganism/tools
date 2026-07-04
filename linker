@@ -82,7 +82,7 @@ do
   if [[ "$DRY_RUN" =~ "Y" ]]; then
     echo -e "${Green}${On_Grey_4}${COMMAND}${Reset}"
   else
-    echo -e "${iWhite}${COMMAND}${Reset}"
+    echo -e "${Grey_12}${COMMAND}${Reset}"
     $COMMAND
   fi
 done
@@ -103,7 +103,7 @@ do
     if [[ "$DRY_RUN" =~ "Y" ]]; then
       echo -e "${Green}${On_Grey_4}${COMMAND}${Reset}"
     else
-      echo -e "${iWhite}${COMMAND}${Reset}"
+      echo -e "${Grey_12}${COMMAND}${Reset}"
       $COMMAND
     fi
   fi
