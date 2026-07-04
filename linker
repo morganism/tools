@@ -43,6 +43,8 @@ ensureProfileIsSourced() {
 	else
 		echo -e "${Red}${On_Grey_4}Oops! $MY_BASH_BROFILE is not linked.${Reset}"
 	fi
+
+        echo -e "${Green}${On_Grey_8}End of ensureProfileIsSourced ${Reset}"
 }
 
 usage() {

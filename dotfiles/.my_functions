@@ -482,3 +482,32 @@ fdir() {
 
   find -E . -type d -regex ".*/${1}"
 }
+cp2uri() {
+  ansi
+  local path
+
+  # Resolve to absolute path
+  path="$(realpath "$1")" || return 1
+
+  # Format for Cypher and copy to clipboard
+  printf "file://%s" "$path" |  pbcopy
+
+  # Optional feedback
+  echo -e "${Green}Copied to clipboard:${Reset}"
+  echo -e "${IGreen}'file://$path'${Reset}"
+}
+bootstrap() {
+  REPO=${1-init}
+  BRANCH=${2-master} # default to 'master' branch but support other branches
+  # a repo that supports bootstrapping will contain bootstrap.sh
+  # curl -fsSL https://raw.githubusercontent.com/morganism/init/refs/heads/master/bootstrap.sh | bash
+  BOOTSTRAP_URL="https://raw.githubusercontent.com/morganism/${REPO}/master/bootstrap.sh"
+
+  if curl -fsI "$BOOTSTRAP_URL" >/dev/null; then
+    echo -e "${Green}Found Bootstrapper: ${IGreen}bootstrap.sh${Green} running ...${Reset}"
+    curl -fsSL "$BOOTSTRAP_URL" | bash
+  else
+    echo -e "${Red}Bootstrapper: ${IRed}bootstrap.sh${Red} not found — ${RRed}aborting${Reset}"
+    return 127
+  fi
+}

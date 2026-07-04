@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -euo pipefail
 
 THIS_PATH() {
     realpath "${BASH_SOURCE[1]}" # return absolute path to the script where THIS_PATH is called from
@@ -13,27 +14,13 @@ THIS_FILE() {
 
 [[ -f ~/.ansi.functions ]] && . ~/.ansi.functions || ( echo -e "🧚 Help on the way" && exit 127 )
 
-# create ~/.my_bash_profile link and add call to ~/.bash_profile (mac) ~/.bashrc (linux)
-link_bash_profile() {
-  ln -sf $(THIS_DIR)/dotfiles/.my_bash_profile ~/.my_bash_profile
-}
-fix_bash_profile() {
-  grep -v 'source ~/.my_bash_profile' ~/.bash_profile > ~/.bash_profile.tmp
-  mv ~/.bash_profile.tmp ~/.bash_profile
-  echo "source ~/.my_bash_profile" >> ~/.bash_profile
-}
 call_linker() {
+  echo -e "${dWhite}call_linker()${Reset}"
+  echo -e "${Grey_8}THIS_DIR [$(THIS_DIR)]${Reset}"
   $(THIS_DIR)/linker
 }
-link_bash_profile
-fix_bash_profile
 call_linker
 
-exit
 
-echo -e "🛟 "
-
-echo "https://raw.githubusercontent.com/morganism/tools/refs/heads/master/message"
-curl "https://raw.githubusercontent.com/morganism/tools/refs/heads/master/message"
 
 

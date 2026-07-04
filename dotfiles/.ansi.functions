@@ -323,41 +323,41 @@ toggle-scr() {
 
   
 
-: <<DOCXX
-Cursor_Up_19='\033[<19>A;'
-Common Cursor Movement Codes
-\033[<L>;<C>H or \033[<L>;<C>f: Move to line L, column C (e.g., \033[1;1H for top-left).
-\033[<N>A: Move cursor Up N lines (default 1).
-\033[<N>B: Move cursor Down N lines (default 1).
-\033[<N>C: Move cursor Right N columns (default 1).
-\033[<N>D: Move cursor Left N columns (default 1).
-\r (Carriage Return): Move to the beginning of the current line.
-\033[<N>E: Move to the start of the line N lines down (default 1).
-\033[<N>F: Move to the start of the line N lines up (default 1).
-\033[<N>G: Move to column N on the current line. 
-Save/Restore Position
-\033[s: Save current cursor position (row/col).
-\033[u: Restore saved cursor position (Note: some older systems/implementations might only restore horizontal position). 
-Clearing Screen/Lines
-\033[2J: Clear the entire screen, move cursor to (0,0).
-\033[K: Erase from cursor to end of line. 
-
-# Start an app in the alternate screen buffer (clears, runs app, restores)
-printf "\033[?1049h" # Enter alternate screen
-# Your app runs here...
-printf "\033[?1049l"
-
-ESC='\033['                  # must
-X r=0,b=1,d=2                # 1 of
-Y i=3; u=4; f=5; R=7; s=9;   # multiple prepend ; if used
-A 30-7, 90-7                 # 1 of prepend ;
-B 40-7, 100-7                # 1 of prepend ; if used
-END='m'
-
-macops:vim morgan$ echo -e "${ESC}${X}[;${Y}];$A[;$B]${END}"
-
-
-Darkest: \033[38;5;232m (Increments up to 255)
-Lightest: \033[38;5;255m
-
-DOCXX
+#: <<DOCXX
+#Cursor_Up_19='\033[<19>A;'
+#Common Cursor Movement Codes
+#\033[<L>;<C>H or \033[<L>;<C>f: Move to line L, column C (e.g., \033[1;1H for top-left).
+#\033[<N>A: Move cursor Up N lines (default 1).
+#\033[<N>B: Move cursor Down N lines (default 1).
+#\033[<N>C: Move cursor Right N columns (default 1).
+#\033[<N>D: Move cursor Left N columns (default 1).
+#\r (Carriage Return): Move to the beginning of the current line.
+#\033[<N>E: Move to the start of the line N lines down (default 1).
+#\033[<N>F: Move to the start of the line N lines up (default 1).
+#\033[<N>G: Move to column N on the current line. 
+#Save/Restore Position
+#\033[s: Save current cursor position (row/col).
+#\033[u: Restore saved cursor position (Note: some older systems/implementations might only restore horizontal position). 
+#Clearing Screen/Lines
+#\033[2J: Clear the entire screen, move cursor to (0,0).
+#\033[K: Erase from cursor to end of line. 
+#
+## Start an app in the alternate screen buffer (clears, runs app, restores)
+#printf "\033[?1049h" # Enter alternate screen
+## Your app runs here...
+#printf "\033[?1049l"
+#
+#ESC='\033['                  # must
+#X r=0,b=1,d=2                # 1 of
+#Y i=3; u=4; f=5; R=7; s=9;   # multiple prepend ; if used
+#A 30-7, 90-7                 # 1 of prepend ;
+#B 40-7, 100-7                # 1 of prepend ; if used
+#END='m'
+#
+#macops:vim morgan$ echo -e "${ESC}${X}[;${Y}];$A[;$B]${END}"
+#
+#
+#Darkest: \033[38;5;232m (Increments up to 255)
+#Lightest: \033[38;5;255m
+#
+#DOCXX
