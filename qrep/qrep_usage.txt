@@ -1,0 +1,80 @@
+qrep v2.0.0
+
+------------------------------------------------------------------------------
+DESCRIPTION
+------------------------------------------------------------------------------
+
+  qrep solves the problem of quickly locating and optionally executing scripts
+  stored in a remote GitHub repository without cloning it locally. It is useful
+  for operations teams or developers who maintain a shared repository of
+  runbooks, snippets, or automation scripts and want a single CLI to discover
+  and run them on any machine.
+
+------------------------------------------------------------------------------
+SYNOPSIS
+------------------------------------------------------------------------------
+
+  qrep <command> [<file>]
+
+------------------------------------------------------------------------------
+OPTIONS
+------------------------------------------------------------------------------
+
+
+
+------------------------------------------------------------------------------
+EXAMPLES
+------------------------------------------------------------------------------
+
+  qrep show
+
+  qrep find deploy.sh
+
+  qrep exec deploy.sh
+
+  qrep find backup-db.sh
+
+  qrep exec bootstrap.sh
+
+  qrep find README.md
+
+  qrep exec setup-env.sh
+
+------------------------------------------------------------------------------
+ENVIRONMENT
+------------------------------------------------------------------------------
+
+  XDG_CONFIG_HOME           If set, the script looks for qrep-config.yaml under $XDG_CONFIG_HOME/qrep/ instead of ~/.config/qrep/.
+  HOME                      Used to resolve ~/.config/qrep/qrep-config.yaml and ~/.qrep-config.yaml.
+
+------------------------------------------------------------------------------
+EXIT CODES
+------------------------------------------------------------------------------
+
+  0     Success (command completed normally)
+  1     Abort due to missing argument, file not found, or GitHub API error
+  127   curl or configured shell not found when exec replaces the process
+
+------------------------------------------------------------------------------
+BUGS / LIMITATIONS
+------------------------------------------------------------------------------
+
+  No GitHub authentication token support, so the script is subject to the unauthenticated GitHub API rate limit (60 requests/hour). The raw URL constructed for 'exec' is not shell-escaped, which could be exploited if file paths in the repository contain shell metacharacters. The 'exec' command replaces the process so no post-execution cleanup or error handling is possible from the script itself. If neither org nor repo is configured the script will produce an unhelpful GitHub API error rather than a clear validation message.
+
+------------------------------------------------------------------------------
+SEE ALSO
+------------------------------------------------------------------------------
+
+  curl(1), bash(1), gh(1), git(1), yaml(3ruby), jq(1)
+
+------------------------------------------------------------------------------
+IMPLEMENTATION NOTES
+------------------------------------------------------------------------------
+
+  The use of Marshal.dump/load for deep-cloning the DEFAULTS hash is a classic
+  Ruby trick that avoids accidental mutation of the frozen constant. The 'exec'
+  command replaces the Ruby process entirely with a shell pipeline (curl |
+  bash), meaning no Ruby code runs after that point, and the exit code is that
+  of the pipeline. Configuration layering mimics the precedence model of tools
+  like git-config, where project-local files override user and system settings.
+

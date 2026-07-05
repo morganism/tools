@@ -1,0 +1,96 @@
+#!/usr/bin/env ruby
+# qrep — Query Repository
+#
+# Browse, search, and execute files from remote GitHub repositories
+#
+
+require 'json'
+require 'net/http'
+require 'uri'
+require 'yaml'
+
+CONFIG_PATHS = [
+  "/etc/qrep/qrep-config.yaml",
+  ENV["XDG_CONFIG_HOME"] ?
+    File.join(ENV["XDG_CONFIG_HOME"], "qrep/qrep-config.yaml") :
+    File.join(Dir.home, ".config/qrep/qrep-config.yaml"),
+  File.join(Dir.home, ".qrep-config.yaml"),
+  File.join(Dir.pwd, ".qrep-config.yaml")
+]
+
+DEFAULTS = {
+  "github" => {
+    "org"    => nil,
+    "repo"   => nil,
+    "branch" => "master"
+  },
+  "execution" => {
+    "confirm"    => true,
+    "shell"      => "bash",
+    "curl_flags" => "-fsSL"
+  }
+}
+
+def deep_merge(a, b)
+  a.merge(b) { |_, o, n| o.is_a?(Hash) && n.is_a?(Hash) ? deep_merge(o, n) : n }
+end
+
+def load_config
+  cfg = Marshal.load(Marshal.dump(DEFAULTS))
+  CONFIG_PATHS.each do |path|
+    next unless File.exist?(path)
+    yaml = YAML.load_file(path) || {}
+    cfg = deep_merge(cfg, yaml.fetch("qrep", {}))
+  end
+  cfg
+end
+
+def github_api(path)
+  uri = URI("https://api.github.com#{path}")
+  req = Net::HTTP::Get.new(uri)
+  req["Accept"] = "application/vnd.github+json"
+
+  Net::HTTP.start(uri.host, uri.port, use_ssl: true) do |http|
+    res = http.request(req)
+    abort "GitHub API error: #{res.code}" unless res.code.to_i == 200
+    JSON.parse(res.body)
+  end
+end
+
+cfg = load_config
+cmd = ARGV.shift
+
+case cmd
+when "show"
+  puts JSON.pretty_generate(cfg)
+
+when "find"
+  needle = ARGV.shift or abort "missing filename"
+  tree = github_api(
+    "/repos/#{cfg["github"]["org"]}/#{cfg["github"]["repo"]}/git/trees/#{cfg["github"]["branch"]}?recursive=1"
+  )
+  tree["tree"]
+    .select { |o| o["type"] == "blob" && File.basename(o["path"]) == needle }
+    .each { |m| puts m["path"] }
+
+when "exec"
+  target = ARGV.shift or abort "missing filename"
+  tree = github_api(
+    "/repos/#{cfg["github"]["org"]}/#{cfg["github"]["repo"]}/git/trees/#{cfg["github"]["branch"]}?recursive=1"
+  )
+  file = tree["tree"].find { |o| o["type"] == "blob" && File.basename(o["path"]) == target }
+  abort "file not found" unless file
+
+  raw = "https://raw.githubusercontent.com/#{cfg["github"]["org"]}/#{cfg["github"]["repo"]}/refs/heads/#{cfg["github"]["branch"]}/#{file["path"]}"
+
+  if cfg["execution"]["confirm"]
+    puts "About to execute:"
+    puts raw
+    puts "Press ENTER to continue or Ctrl+C to abort"
+    STDIN.gets
+  end
+
+  exec("curl #{cfg["execution"]["curl_flags"]} #{raw} | #{cfg["execution"]["shell"]}")
+else
+  puts "qrep commands: show, find <file>, exec <file>"
+end
