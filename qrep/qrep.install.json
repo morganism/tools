@@ -1,0 +1,62 @@
+{
+  "binary": {
+    "source": "qrep",
+    "target": "qrep",
+    "destination": "/usr/local/bin",
+    "chmod": "0755"
+  },
+  "man_pages": [
+    {
+      "source": "qrep.1",
+      "section": "1",
+      "destination": "/usr/local/share/man/man1"
+    }
+  ],
+  "dependencies": {
+    "ruby_version": "2.5",
+    "gems": [],
+    "system_bins": [
+      {
+        "bin": "curl",
+        "package": "curl",
+        "optional": false
+      },
+      {
+        "bin": "bash",
+        "package": "bash",
+        "optional": true
+      }
+    ]
+  },
+  "environment": [
+    {
+      "var": "XDG_CONFIG_HOME",
+      "required": false,
+      "description": "Override the default ~/.config base directory for qrep configuration.",
+      "suggest_export": "export XDG_CONFIG_HOME=$HOME/.config"
+    }
+  ],
+  "config_dirs": [
+    {
+      "path": "~/.config/qrep",
+      "mode": "0700",
+      "description": "Per-user configuration directory for qrep."
+    }
+  ],
+  "config_files": [],
+  "post_install_notes": [
+    "Create a configuration file at one of the supported paths (~/.config/qrep/qrep-config.yaml, ~/.qrep-config.yaml, or ./.qrep-config.yaml) with at minimum the github.org and github.repo keys under a top-level 'qrep' key.",
+    "Example minimal config:\n  qrep:\n    github:\n      org: my-org\n      repo: my-scripts\n      branch: main",
+    "If you exceed the GitHub API rate limit, consider adding authentication support or reducing request frequency.",
+    "The default execution shell is bash; change execution.shell in the config to use a different interpreter."
+  ],
+  "uninstall_notes": [
+    "Remove the binary: sudo rm /usr/local/bin/qrep",
+    "Remove the man page if installed: sudo rm /usr/local/share/man/man1/qrep.1",
+    "Optionally remove configuration files: rm -rf ~/.config/qrep ~/.qrep-config.yaml",
+    "Optionally remove system config: sudo rm -rf /etc/qrep"
+  ],
+  "name": "qrep",
+  "version": "2.0.0",
+  "author": "morgan"
+}

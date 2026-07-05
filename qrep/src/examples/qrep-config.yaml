@@ -1,0 +1,8 @@
+qrep:
+  github:
+    org: morganism
+    repo: tools
+    branch: master
+
+  execution:
+    confirm: true
