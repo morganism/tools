@@ -57,10 +57,37 @@ def github_api(path)
   end
 end
 
+def help
+  puts <<~HELP
+    qrep — Query Repository
+
+    Commands:
+      qrep set <key> <value>   Persist default config
+      qrep config              Edit user config
+      qrep show                Show resolved config
+      qrep find <file>
+      qrep exec <file>
+      qrep help                Display this help. see: man qrep 
+
+    Keys:
+      org, repo, branch
+  HELP
+end
+
 cfg = load_config
 cmd = ARGV.shift
 
 case cmd
+when "set"
+  key   = ARGV.shift or abort "usage: qrep set <key> <value>"
+  value = ARGV.shift or abort "usage: qrep set <key> <value>"
+  persist_setting(key, value)
+
+when "config"
+  path = ensure_user_config
+  editor = ENV["EDITOR"] || "vi"
+  exec("#{editor} #{path}")
+
 when "show"
   puts JSON.pretty_generate(cfg)
 
@@ -91,6 +118,8 @@ when "exec"
   end
 
   exec("curl #{cfg["execution"]["curl_flags"]} #{raw} | #{cfg["execution"]["shell"]}")
+when "help"
+  help
 else
-  puts "qrep commands: show, find <file>, exec <file>"
+  help
 end
