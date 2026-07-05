@@ -511,3 +511,31 @@ bootstrap() {
     return 127
   fi
 }
+bootstrappers() {
+  ansi
+  REPO=${1}
+  if [[ "${REPO}" =~ -h ]]; then
+    echo -e "${Blue}Usage: ${IWhite}bootstrappers ${dWhite}[REPO] [-h]${Reset}"
+    return 63
+  elif [[ -n ${REPO} ]]; then
+    RESULT=$(find ~/data/src -regex ".*/${REPO}/bootstrap.sh")
+    echo -e "${IWhite}${RESULT}${Reset}"
+  else
+    for i in `find ~/data/src -type d -name '*.git'`
+    do
+      DIR=$(dirname $i)
+      find $DIR -regex "$DIR/bootstrap.sh"
+    done
+  fi
+}
+ensure_repo_cloned() {
+  ansi
+  if [[ -z $1 ]]; then
+    echo -e "${dRed}Usage: ${White}ensure_repo_cloned ${IWhite}REPO${Reset}"
+    return 127
+  fi
+
+  REPO=$1
+  
+
+}
