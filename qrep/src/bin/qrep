@@ -74,6 +74,40 @@ def help
   HELP
 end
 
+def user_config_path
+  base = ENV["XDG_CONFIG_HOME"] || File.join(Dir.home, ".config")
+  File.join(base, "qrep", "qrep-config.yaml")
+end
+
+def ensure_user_config
+  path = user_config_path
+  dir  = File.dirname(path)
+  Dir.mkdir(dir) unless Dir.exist?(dir)
+
+  unless File.exist?(path)
+    File.write(path, { "qrep" => {} }.to_yaml)
+  end
+
+  path
+end
+
+def persist_setting(key, value)
+  path = ensure_user_config
+  cfg  = YAML.load_file(path) || { "qrep" => {} }
+
+  cfg["qrep"]["github"] ||= {}
+
+  case key
+  when "org", "repo", "branch"
+    cfg["qrep"]["github"][key] = value
+  else
+    abort "unknown config key: #{key}"
+  end
+
+  File.write(path, cfg.to_yaml)
+  puts "✔ saved #{key}=#{value} to #{path}"
+end
+
 cfg = load_config
 cmd = ARGV.shift
 
