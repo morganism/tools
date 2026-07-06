@@ -1,2 +1,4 @@
-:%s/echo "\([^"][^"]*\)"/echo -e "${_}\1${RESET}"/g
+:%s/echo "\([^"][^"]*\)"/echo -e "${_}\1${RESET}"/g  # echo "Build complete" to echo -e "${_}Build complete${RESET}"
+
+:%s/echo -e "\${_}\([^"]*\)\${RESET}"/echo "\1"/g    # echo -e "${_}Build complete${RESET}" to echo "Build complete"
 
