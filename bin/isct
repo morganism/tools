@@ -46,7 +46,7 @@ show_progress_bar() {
     echo -e "${WHITE}│${NC}"
     echo -e "${WHITE}└──────────────────────────────────────────────────────┘${NC}"
     echo ""
-}#!/bin/bash
+}
 
 # Interactive CLI Menu System
 # Walks user through providing arguments via menus and questions
@@ -69,18 +69,6 @@ NC='\033[0m' # No Color
 # ANSI Effects
 BOLD='\033[1m'
 DIM='\033[2m'
-UNDERLINE='\033[4m'
-BLINK='\033[5m'
-REVERSE='\033[7m'
-RESET='\033[0m'
-
-# Background colors
-BG_RED='\033[41m'
-BG_GREEN='\033[42m'
-BG_YELLOW='\033[43m'
-BG_BLUE='\033[44m'
-BG_PURPLE='\033[45m'
-BG_CYAN='\033[46m'
 
 # Clear screen and show animated header
 show_header() {
@@ -213,7 +201,7 @@ get_choice() {
                 if [ "$choice" -le "$max_option" ]; then
                     echo -e "${GREEN}✓ ${GRAY}Option $choice selected${NC}"
                     sleep 0.3
-                    return $choice
+                    return "$choice"
                 else
                     echo -e "${RED}❌ Invalid option. Please select 1-$max_option${NC}"
                 fi
@@ -347,16 +335,16 @@ handle_server_config() {
                     echo -e "${CYAN}│${NC}"
                     echo -e "${CYAN}└──────────────────────────────────────────────────────┘${NC}"
                     echo -ne "${GRAY}Press ${WHITE}Enter${GRAY} to continue...${NC}"
-                    read
+                    read -r
                 else
                     echo -e "${RED}❌ Please set server and port first${NC}"
                     echo -ne "${GRAY}Press ${WHITE}Enter${GRAY} to continue...${NC}"
-                    read
+                    read -r
                 fi
                 ;;
             98)
                 current_menu="${menu_stack[-1]}"
-                unset menu_stack[-1]
+                unset "menu_stack[-1]"
                 return
                 ;;
             99)
@@ -384,14 +372,14 @@ handle_environment_config() {
         3) config[environment]="production" ;;
         98)
             current_menu="${menu_stack[-1]}"
-            unset menu_stack[-1]
+                unset "menu_stack[-1]"
             return
             ;;
         99) exit 0 ;;
     esac
     
     current_menu="${menu_stack[-1]}"
-    unset menu_stack[-1]
+                unset "menu_stack[-1]"
 }
 
 handle_database_config() {
@@ -414,14 +402,14 @@ handle_database_config() {
         4) config[database]="mongodb" ;;
         98)
             current_menu="${menu_stack[-1]}"
-            unset menu_stack[-1]
+                unset "menu_stack[-1]"
             return
             ;;
         99) exit 0 ;;
     esac
     
     current_menu="${menu_stack[-1]}"
-    unset menu_stack[-1]
+                unset "menu_stack[-1]"
 }
 
 handle_ssl_config() {
@@ -440,14 +428,14 @@ handle_ssl_config() {
         2) config[ssl]="disabled" ;;
         98)
             current_menu="${menu_stack[-1]}"
-            unset menu_stack[-1]
+                unset "menu_stack[-1]"
             return
             ;;
         99) exit 0 ;;
     esac
     
     current_menu="${menu_stack[-1]}"
-    unset menu_stack[-1]
+                unset "menu_stack[-1]"
 }
 
 show_final_config() {
@@ -520,7 +508,7 @@ show_final_config() {
             echo -e "${CYAN}└──────────────────────────────────────────────────────┘${NC}"
             echo ""
             echo -ne "${GRAY}Press ${WHITE}Enter${GRAY} to continue...${NC}"
-            read
+            read -r
             ;;
         2)
             local script_name="config_command.sh"
@@ -529,7 +517,7 @@ show_final_config() {
             chmod +x "$script_name"
             echo -e "${GREEN}✅ Command saved to ${BOLD}$script_name${NC}"
             echo -ne "${GRAY}Press ${WHITE}Enter${GRAY} to continue...${NC}"
-            read
+            read -r
             ;;
         3)
             local cmd_text="myapp --server=${config[server]} --port=${config[port]} --env=${config[environment]} --db=${config[database]} --ssl=${config[ssl]}"
@@ -544,7 +532,7 @@ show_final_config() {
                 echo -e "${GRAY}Command: ${WHITE}$cmd_text${NC}"
             fi
             echo -ne "${GRAY}Press ${WHITE}Enter${GRAY} to continue...${NC}"
-            read
+            read -r
             ;;
         4)
             return
@@ -603,7 +591,7 @@ main_menu() {
                 else
                     echo -e "${RED}❌ Please complete all configuration items first!${NC}"
                     echo -ne "${GRAY}Press ${WHITE}Enter${GRAY} to continue...${NC}"
-                    read
+                    read -r
                 fi
                 ;;
             98) 
@@ -637,7 +625,7 @@ show_loading() {
     local duration="${2:-2}"
     
     echo -ne "${CYAN}$message${NC}"
-    for i in $(seq 1 $duration); do
+    for i in $(seq 1 "$duration"); do
         for spinner in '⠋' '⠙' '⠹' '⠸' '⠼' '⠴' '⠦' '⠧' '⠇' '⠏'; do
             echo -ne "\r${CYAN}$message ${YELLOW}$spinner${NC}"
             sleep 0.1

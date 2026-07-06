@@ -9,13 +9,16 @@ require 'net/http'
 require 'uri'
 require 'yaml'
 
-CONFIG_PATHS = [
-  "/etc/qrep/qrep-config.yaml",
-  ENV["XDG_CONFIG_HOME"] ?
-    File.join(ENV["XDG_CONFIG_HOME"], "qrep/qrep-config.yaml") :
-    File.join(Dir.home, ".config/qrep/qrep-config.yaml"),
+VERSION = '0.0.1'
+
+USER_CONFIG_PATHS = [
+  File.join(Dir.pwd, ".qrep-config.yaml"),
   File.join(Dir.home, ".qrep-config.yaml"),
-  File.join(Dir.pwd, ".qrep-config.yaml")
+  File.join(Dir.home, ".config/qrep/qrep-config.yaml")
+]
+
+SYSTEM_CONFIG_PATHS = [
+  "/etc/qrep/qrep-config.yaml"
 ]
 
 DEFAULTS = {
@@ -31,18 +34,13 @@ DEFAULTS = {
   }
 }
 
-def deep_merge(a, b)
-  a.merge(b) { |_, o, n| o.is_a?(Hash) && n.is_a?(Hash) ? deep_merge(o, n) : n }
+def version
+  puts VERSION
 end
 
-def load_config
-  cfg = Marshal.load(Marshal.dump(DEFAULTS))
-  CONFIG_PATHS.each do |path|
-    next unless File.exist?(path)
-    yaml = YAML.load_file(path) || {}
-    cfg = deep_merge(cfg, yaml.fetch("qrep", {}))
-  end
-  cfg
+
+def deep_merge(a, b)
+  a.merge(b) { |_, o, n| o.is_a?(Hash) && n.is_a?(Hash) ? deep_merge(o, n) : n }
 end
 
 def github_api(path)
@@ -57,7 +55,77 @@ def github_api(path)
   end
 end
 
-def help
+def load_config
+  cfg = Marshal.load(Marshal.dump(DEFAULTS))
+  config_paths.each do |path|
+    next unless File.exist?(path)
+    puts "load_config #{path}"
+    yaml = YAML.load_file(path) || {}
+    cfg = deep_merge(cfg, yaml.fetch("qrep", {}))
+  end
+  cfg
+end
+
+def config_paths
+  USER_CONFIG_PATHS + SYSTEM_CONFIG_PATHS
+end
+
+def user_config_path
+  paths = Array.new
+  config_paths.each do |path|
+    puts "user_config_path each #{path} #{path.class}"
+    paths << path if File.exist?(path)
+    puts "user_config_path each #{paths.size} #{paths.first}"
+  end
+
+  paths.first
+end
+
+def ensure_user_config
+  path = user_config_path
+  puts "ensure_user_config #{path} #{path.class}"
+  dir  = File.dirname(path)
+  puts "ensure_user_config #{dir}"
+
+  Dir.mkdir(dir) unless Dir.exist?(dir)
+
+  unless File.exist?(path)
+    File.write(path, { "qrep" => {} }.to_yaml)
+  end
+
+  path
+end
+
+def persist_setting(key, value)
+  path = ensure_user_config
+  puts "persist_setting #{path.class}"
+  cfg  = YAML.load_file(path) || { "qrep" => {} }
+
+  cfg["qrep"]["github"] ||= {}
+
+  case key
+  when "org", "repo", "branch"
+    cfg["qrep"]["github"][key] = value
+  else
+    abort "unknown config key: #{key}"
+  end
+
+  File.write(path, cfg.to_yaml)
+  puts "✔ saved #{key}=#{value} to #{path}"
+end
+
+def cmd_find(c)
+  cfg = c
+  needle = ARGV.shift or abort "missing filename"
+  tree = github_api(
+    "/repos/#{cfg["github"]["org"]}/#{cfg["github"]["repo"]}/git/trees/#{cfg["github"]["branch"]}?recursive=1"
+  )
+  tree["tree"]
+    .select { |o| o["type"] == "blob" && File.basename(o["path"]) == needle }
+    .each { |m| puts m["path"] }
+end
+
+def cmd_help
   puts <<~HELP
     qrep — Query Repository
 
@@ -74,86 +142,51 @@ def help
   HELP
 end
 
-def user_config_path
-  base = ENV["XDG_CONFIG_HOME"] || File.join(Dir.home, ".config")
-  File.join(base, "qrep", "qrep-config.yaml")
-end
+def main
+  cfg = load_config
+  cmd = ARGV.shift
+  case cmd
+  when "set"
+    key   = ARGV.shift or abort "usage: qrep set <key> <value>"
+    value = ARGV.shift or abort "usage: qrep set <key> <value>"
+    persist_setting(key, value)
 
-def ensure_user_config
-  path = user_config_path
-  dir  = File.dirname(path)
-  Dir.mkdir(dir) unless Dir.exist?(dir)
+  when "config"
+    path = ensure_user_config
+    puts "config #{path.class}"
+    editor = ENV["EDITOR"] || "vi"
+    exec("#{editor} #{path}")
 
-  unless File.exist?(path)
-    File.write(path, { "qrep" => {} }.to_yaml)
-  end
+  when "show"
+    puts JSON.pretty_generate(cfg)
 
-  path
-end
+  when "find"
+    cmd_find cfg
+  when "exec"
+    target = ARGV.shift or abort "missing filename"
+    tree = github_api(
+      "/repos/#{cfg["github"]["org"]}/#{cfg["github"]["repo"]}/git/trees/#{cfg["github"]["branch"]}?recursive=1"
+    )
+    file = tree["tree"].find { |o| o["type"] == "blob" && File.basename(o["path"]) == target }
+    abort "file not found" unless file
 
-def persist_setting(key, value)
-  path = ensure_user_config
-  cfg  = YAML.load_file(path) || { "qrep" => {} }
+    raw = "https://raw.githubusercontent.com/#{cfg["github"]["org"]}/#{cfg["github"]["repo"]}/refs/heads/#{cfg["github"]["branch"]}/#{file["path"]}"
 
-  cfg["qrep"]["github"] ||= {}
+    if cfg["execution"]["confirm"]
+      puts "About to execute:"
+      puts raw
+      puts "Press ENTER to continue or Ctrl+C to abort"
+      STDIN.gets
+    end
 
-  case key
-  when "org", "repo", "branch"
-    cfg["qrep"]["github"][key] = value
+    exec("curl #{cfg["execution"]["curl_flags"]} #{raw} | #{cfg["execution"]["shell"]}")
+  when "help"
+    cmd_help
+  when "version"
+    version  
   else
-    abort "unknown config key: #{key}"
+    help
   end
-
-  File.write(path, cfg.to_yaml)
-  puts "✔ saved #{key}=#{value} to #{path}"
 end
 
-cfg = load_config
-cmd = ARGV.shift
-
-case cmd
-when "set"
-  key   = ARGV.shift or abort "usage: qrep set <key> <value>"
-  value = ARGV.shift or abort "usage: qrep set <key> <value>"
-  persist_setting(key, value)
-
-when "config"
-  path = ensure_user_config
-  editor = ENV["EDITOR"] || "vi"
-  exec("#{editor} #{path}")
-
-when "show"
-  puts JSON.pretty_generate(cfg)
-
-when "find"
-  needle = ARGV.shift or abort "missing filename"
-  tree = github_api(
-    "/repos/#{cfg["github"]["org"]}/#{cfg["github"]["repo"]}/git/trees/#{cfg["github"]["branch"]}?recursive=1"
-  )
-  tree["tree"]
-    .select { |o| o["type"] == "blob" && File.basename(o["path"]) == needle }
-    .each { |m| puts m["path"] }
-
-when "exec"
-  target = ARGV.shift or abort "missing filename"
-  tree = github_api(
-    "/repos/#{cfg["github"]["org"]}/#{cfg["github"]["repo"]}/git/trees/#{cfg["github"]["branch"]}?recursive=1"
-  )
-  file = tree["tree"].find { |o| o["type"] == "blob" && File.basename(o["path"]) == target }
-  abort "file not found" unless file
-
-  raw = "https://raw.githubusercontent.com/#{cfg["github"]["org"]}/#{cfg["github"]["repo"]}/refs/heads/#{cfg["github"]["branch"]}/#{file["path"]}"
-
-  if cfg["execution"]["confirm"]
-    puts "About to execute:"
-    puts raw
-    puts "Press ENTER to continue or Ctrl+C to abort"
-    STDIN.gets
-  end
-
-  exec("curl #{cfg["execution"]["curl_flags"]} #{raw} | #{cfg["execution"]["shell"]}")
-when "help"
-  help
-else
-  help
-end
+main
