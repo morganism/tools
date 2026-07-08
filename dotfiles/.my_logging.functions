@@ -6,8 +6,8 @@
 THIS="$(realpath $BASH_SOURCE)"
 DIR="$(dirname $THIS)"
 
-LIB_COLOURS=".ansi_colours.env"
-LIB_DATETIME=".datetime.functions"
+LIB_COLOURS=".ansi.functions"
+LIB_DATETIME=".my_datetime.functions"
 [[ -f "${DIR}/${LIB_COLOURS}" ]] && source "${DIR}/${LIB_COLOURS}"
 [[ -f "${DIR}/${LIB_DATETIME}" ]] && source "${DIR}/${LIB_DATETIME}"
 
@@ -34,28 +34,23 @@ logging.mode() {
 
 # -------------- LOGGING
 info() {
-  ts_rfc3339
-  echo -e "${IBlack}[${IBlue}$TS${IBlack}]${Blue} $1${Reset}"
+  echo -e "${IBlack}[${Blue}$(ts)${IBlack}]${dWhite} $1${Reset}"
 }
 
 error() {
-  ts_rfc3339
-  echo -e "${IBlack}[${IRed}$TS${IBlack}]${Red} $1${Reset}"
+  echo -e "${IBlack}[${Red}$(ts)${IBlack}]${dWhite} $1${Reset}"
 }
 
 ok() {
-  ts_rfc3339
-  echo -e "${IBlack}[${IGreen}$TS${IBlack}]${Green} $1${Reset}"
+  echo -e "${IBlack}[${Green}$(ts)${IBlack}]${dWhite} $1${Reset}"
 }
 
 warn() {
-  ts_rfc3339
-  echo -e "${IBlack}[${IYellow}$TS${IBlack}]${Yellow} $1${Reset}"
+  echo -e "${IBlack}[${Yellow}$(ts)${IBlack}]${dWhite} $1${Reset}"
 }
 
 alert() {
-  ts_rfc3339
-  echo -e "${IBlack}[${IYellow}$TS${IBlack}]${Yellow} $1${Reset}"
+  echo -e "${IBlack}[${RRed}$(ts)${IBlack}]${dWhite} $1${Reset}"
 }
 
 

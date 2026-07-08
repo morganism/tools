@@ -18,7 +18,7 @@ export COLORTERM=truecolor
 
 set -o vi
 [[ -e ~/.vw.function ]] && source ~/.vw.function
-for f in $(ls -1 ~/.my_*)
+for f in $(ls -1 ~/.my_* | grep -v 'bash_profile')
 do
   source $f
 done
