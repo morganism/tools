@@ -4,99 +4,107 @@ Add description
 Author: morgan@morganism.dev
 Date: Fri 10 Apr 2026 18:10:32 BST
 DOCXX
- #!/usr/bin/env bash
 set -euo pipefail
+[[ -e ~/.ansi.functions ]] && source ~/.ansi.functions
 
+TOKEN_DIR="~/tokens"
 ENV_FILE=".env"
 
 # --- Load .env ---------------------------------------------------------------
-if [[ ! -f "$ENV_FILE" ]]; then
-  echo "❌ .env file not found. Expected TOKEN_DIR to be defined."
-  exit 1
-fi
+loadEnv() {
+  echo -e "${Purple}${On_Grey_8}✅ 0 ${Reset}"
+  [[ -f "$ENV_FILE" ]] && source "$ENV_FILE" && echo -e "${Green}${On_Grey_8}✅ .env file found and 'sourced'${Reset}"
+  echo -e "${Purple}${On_Grey_8}✅ 1 ${Reset}"
+}
 
-# shellcheck disable=SC1090
-source "$ENV_FILE"
+checkTokenDir() {
+  echo -e "${Purple}${On_Grey_8}✅ 0 ${Reset}"
+  [[ -z "${TOKEN_DIR:-}" ]] && echo -e "${Red}${On_Grey_8}❌ TOKEN_DIR is not set in .env${Reset}"
+  echo -e "${Purple}${On_Grey_8}✅ 1 ${Reset}"
+}
 
-if [[ -z "${TOKEN_DIR:-}" ]]; then
-  echo "❌ TOKEN_DIR is not set in .env"
-  exit 1
-fi
+main() {
+  loadEnv
+  checkTokenDir
+  echo -e "${Purple}${On_Grey_8}✅ ${Reset}"
+  mkdir -p "$TOKEN_DIR"
+  TOKEN_FILE="$TOKEN_DIR/GH_TOKEN"
 
-mkdir -p "$TOKEN_DIR"
-TOKEN_FILE="$TOKEN_DIR/GH_TOKEN"
+  # --- If GH_TOKEN already set -------------------------------------------------
+  if [[ -n "${GH_TOKEN:-}" ]]; then
+    echo -e "${Green}${On_Grey_8}✅ GH_TOKEN already set in environment${Reset}"
+    exit 0
+  fi
 
-# --- If GH_TOKEN already set -------------------------------------------------
-if [[ -n "${GH_TOKEN:-}" ]]; then
-  echo "✅ GH_TOKEN already set in environment"
-  exit 0
-fi
+  # --- If token file exists ----------------------------------------------------
+  if [[ -f "$TOKEN_FILE" ]]; then
+    export GH_TOKEN
+    GH_TOKEN="$(<"$TOKEN_FILE")"
+    echo -e "${Green}${On_Grey_8}✅ GH_TOKEN loaded from $TOKEN_FILE${Reset}"
+    exit 0
+  fi
 
-# --- If token file exists ----------------------------------------------------
-if [[ -f "$TOKEN_FILE" ]]; then
+  echo -e "${Red}${On_Grey_8}⚠️  GH_TOKEN is not set.${Reset}"
+
+  echo
+  echo -e "${dBlue}${On_Grey_8}Choose an option:${Reset}"
+  echo -e "${dBlue}${On_Grey_10}  1) Paste an existing GitHub token${Reset}"
+  echo -e "${dBlue}${On_Grey_10}  2) Create a new token via GitHub API (requires gh CLI)${Reset}"
+  echo
+
+  read -rp "Select [1/2]: " choice
+
+  case "$choice" in
+    1)
+      read -rsp "Paste GH_TOKEN: " GH_TOKEN
+      echo
+      ;;
+    2)
+      if ! command -v gh >/dev/null 2>&1; then
+        echo -e "${Red}${On_Grey_8}❌ ERROR[$?] gh CLI not found. Install from https://cli.github.com/${Reset}"
+        exit 1
+      fi
+
+      if ! gh auth status >/dev/null 2>&1; then
+        echo -e "${Red}${On_Grey_8}❌ gh is not authenticated. Run: gh auth login${Reset}"
+        exit 1
+      fi
+
+      echo -e "${IBlue}${On_Grey_4}🔐 Creating GitHub token via API...${Reset}"
+
+      COMMAND="
+        gh api \
+          --method POST \
+          -H 'Accept: application/vnd.github+json' \
+          /authorizations \
+          -f note='auto-generated-gh-token' \
+          -f scopes[]='repo' \
+          -f scopes[]='read:org' \
+          -f scopes[]='workflow' \
+          --jq '.token' "
+      echo -e "${Blue}COMMAND [$COMMAND]${Reset}"  
+
+      GH_TOKEN="$($COMMAND)"
+
+      if [[ -z "$GH_TOKEN" || "$GH_TOKEN" == "null" ]]; then
+        echo -e "${Red}${On_Grey_8}❌ Failed to create token${Reset}"
+        exit 1
+      fi
+      ;;
+    *)
+      echo -e "${Red}${On_Grey_8}❌ Invalid choice${Reset}"
+      exit 1
+      ;;
+  esac
+
+  # --- Persist token -----------------------------------------------------------
+  umask 077
+  printf '%s\n' "$GH_TOKEN" > "$TOKEN_FILE"
+
   export GH_TOKEN
-  GH_TOKEN="$(<"$TOKEN_FILE")"
-  echo "✅ GH_TOKEN loaded from $TOKEN_FILE"
-  exit 0
-fi
 
-echo "⚠️  GH_TOKEN is not set."
+  echo -e "${Green}${On_Grey_10}✅ GH_TOKEN saved to $TOKEN_FILE${Reset}"
+  echo -e "${Green}${On_Grey_10}✅ GH_TOKEN exported to environment${Reset}"
 
-echo
-echo "Choose an option:"
-echo "  1) Paste an existing GitHub token"
-echo "  2) Create a new token via GitHub API (requires gh CLI)"
-echo
-
-read -rp "Select [1/2]: " choice
-
-case "$choice" in
-  1)
-    read -rsp "Paste GH_TOKEN: " GH_TOKEN
-    echo
-    ;;
-  2)
-    if ! command -v gh >/dev/null 2>&1; then
-      echo "❌ gh CLI not found. Install from https://cli.github.com/"
-      exit 1
-    fi
-
-    if ! gh auth status >/dev/null 2>&1; then
-      echo "❌ gh is not authenticated. Run: gh auth login"
-      exit 1
-    fi
-
-    echo "🔐 Creating GitHub token via API..."
-
-    GH_TOKEN="$(
-      gh api \
-        --method POST \
-        -H "Accept: application/vnd.github+json" \
-        /authorizations \
-        -f note="auto-generated-gh-token" \
-        -f scopes[]="repo" \
-        -f scopes[]="read:org" \
-        -f scopes[]="workflow" \
-        --jq '.token'
-    )"
-
-    if [[ -z "$GH_TOKEN" || "$GH_TOKEN" == "null" ]]; then
-      echo "❌ Failed to create token"
-      exit 1
-    fi
-    ;;
-  *)
-    echo "❌ Invalid choice"
-    exit 1
-    ;;
-esac
-
-# --- Persist token -----------------------------------------------------------
-umask 077
-printf '%s\n' "$GH_TOKEN" > "$TOKEN_FILE"
-
-export GH_TOKEN
-
-echo "✅ GH_TOKEN saved to $TOKEN_FILE"
-echo "✅ GH_TOKEN exported to environment"
-
+}
+main

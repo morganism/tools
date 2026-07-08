@@ -45,17 +45,17 @@ LABEL="DATAUSB"
 # -------------------------------
 show_help() {
   echo -e "${WHITE}"
-  echo "Usage:"
-  echo "  sudo $0 -t <filesystem> <device>"
-  echo "  sudo $0 <device> -t <filesystem>"
-  echo ""
-  echo "Example:"
-  echo "  sudo $0 -t exfat sdb"
-  echo ""
-  echo "Accepted filesystems:"
-  echo "  ext4 | exfat | vfat"
-  echo ""
-  echo "Available block devices:"
+  echo -e "Usage:"
+  echo -e "  sudo $0 -t <filesystem> <device>"
+  echo -e "  sudo $0 <device> -t <filesystem>"
+  echo -e ""
+  echo -e "Example:"
+  echo -e "  sudo $0 -t exfat sdb"
+  echo -e ""
+  echo -e "Accepted filesystems:"
+  echo -e "  ext4 | exfat | vfat"
+  echo -e ""
+  echo -e "Available block devices:"
   lsblk -d -o NAME,SIZE,TYPE,MODEL,RM | awk '
     NR==1 {print; next}
     $3=="disk" && $1 !~ /^loop/ && $1 !~ /^ram/ {print}

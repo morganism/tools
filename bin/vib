@@ -17,8 +17,8 @@ echo -e "${Blue}here: ${IBlue}$(THIS_DIR)${NC}"
 sleep 1
 
 usage() {
-    echo "Missing filename.\nUsage: $(basename $0) [-b] file"
-    echo "  where -b FILE .. Create FILE in $HOME/bin"
+    echo -e "${Grey_4}${On_Grey_16}Missing filename.\nUsage: $(basename $0) [-b] file${Reset}"
+    echo -e "${Grey_4}${On_Grey_16}  where -b FILE .. Create FILE in $HOME/bin${Reset}"
 }
 
 dash() {
@@ -29,7 +29,7 @@ dash() {
 
 create_or_edit() {
     if [[ -z "$1" ]]; then
-        echo "no FILE passed to create_or_edit function"
+        echo -e "${Grey_4}${On_Grey_16}no FILE passed to create_or_edit function${Reset}"
         exit 3
     fi 
 
@@ -40,16 +40,16 @@ create_or_edit() {
         source .vib   # source default settings file
     fi
     RP=$(realpath $1)
-    echo "realpath to '$1' is: $RP"    
+    echo -e "${Grey_4}${On_Grey_16}realpath to '$1' is: $RP${Reset}"    
 
     SNIPPETS="~/.my_snippets"
     if [[ ! -e $1 ]]; then
       echo '#!/usr/bin/env bash' >> $1
-      echo ": <<DOCXX"           >> $1
-      echo "Add description"     >> $1
-      echo "Author: $AUTHOR"     >> $1
-      echo "Date: $(date)"       >> $1
-      echo "DOCXX"               >> $1
+      echo -e "${Grey_4}${On_Grey_16}: <<DOCXX${Reset}"           >> $1
+      echo -e "${Grey_4}${On_Grey_16}Add description${Reset}"     >> $1
+      echo -e "${Grey_4}${On_Grey_16}Author: $AUTHOR${Reset}"     >> $1
+      echo -e "${Grey_4}${On_Grey_16}Date: $(date)${Reset}"       >> $1
+      echo -e "${Grey_4}${On_Grey_16}DOCXX${Reset}"               >> $1
       echo ""                    >> $1
     fi
     touch                           $1
@@ -68,12 +68,12 @@ elif [[ "$1" =~ ^-b ]]; then
     shift
 
     if [[ -z $1 ]]; then
-        echo "-b flag but no FILE ¿¿"
+        echo -e "${Grey_4}${On_Grey_16}-b flag but no FILE ¿¿${Reset}"
 
         usage
         exit 2   
     fi
-    echo "Creating new file in $HOME/bin/$1"
+    echo -e "${Grey_4}${On_Grey_16}Creating new file in $HOME/bin/$1${Reset}"
     create_or_edit "$HOME/bin/$1"
 fi
 
@@ -86,7 +86,7 @@ else
         create_or_edit "$1" ;
         exit
     else
-       echo "no bin no exist file so create"
+       echo -e "${Grey_4}${On_Grey_16}no bin no exist file so create${Reset}"
     fi
 fi
 echo $1
