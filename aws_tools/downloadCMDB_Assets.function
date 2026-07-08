@@ -1,0 +1,298 @@
+###############################################################################
+# downloadCMDB_Assets
+###############################################################################
+downloadCMDB_Assets()
+{
+    local BUCKET="cmdb-trade-tariff-382373577178"
+    local PREFIX="HMRC-2388/"
+    local S3_URI="s3://${BUCKET}/${PREFIX}"
+
+    local LOGFILE
+    LOGFILE="${HOME}/downloadCMDB_Assets.$(date +%Y%m%d-%H%M%S).log"
+
+    local START_TIME
+    START_TIME=$(date +%s)
+
+    ###########################################################################
+    # ANSI
+    ###########################################################################
+
+    local Reset="\033[0m"
+
+    local Bold="\033[1m"
+
+    local Black="\033[30m"
+    local Red="\033[31m"
+    local Green="\033[32m"
+    local Yellow="\033[33m"
+    local Blue="\033[34m"
+    local Magenta="\033[35m"
+    local Cyan="\033[36m"
+    local White="\033[37m"
+
+    local Clear="\033[2J"
+    local Home="\033[H"
+
+    local Hide="\033[?25l"
+    local Show="\033[?25h"
+
+    local Tick="✔"
+    local Cross="✘"
+    local Box="☐"
+    local Checked="☑"
+
+    exec 3>&1
+
+    log()
+    {
+        printf "[%(%F %T)T] %s\n" -1 "$*" >>"$LOGFILE"
+    }
+
+    run()
+    {
+        log "COMMAND: $*"
+
+        local OUTPUT
+        OUTPUT="$("$@" 2>&1)"
+        local RC=$?
+
+        log "$OUTPUT"
+        log "RETURN=$RC"
+
+        printf "%s" "$OUTPUT"
+
+        return $RC
+    }
+
+    cleanup()
+    {
+        printf "${Show}${Reset}"
+    }
+
+    trap cleanup EXIT
+
+    printf "${Hide}"
+
+    ###########################################################################
+    # Header
+    ###########################################################################
+
+    printf "${Clear}${Home}"
+
+    printf "${Bold}${Cyan}"
+    printf "┌────────────────────────────────────────────────────────────┐\n"
+    printf "│                  CMDB Asset Downloader                     │\n"
+    printf "└────────────────────────────────────────────────────────────┘\n"
+    printf "${Reset}\n"
+
+    ###########################################################################
+    # Validate AWS Login
+    ###########################################################################
+
+    printf "${Yellow}Checking AWS authentication...${Reset}\n"
+
+    if ! IDENTITY=$(run aws sts get-caller-identity)
+    then
+        printf "\n${Red}${Cross} AWS CLI is not authenticated${Reset}\n"
+        printf "Log: %s\n" "$LOGFILE"
+        return 1
+    fi
+
+    printf "${Green}${Tick} AWS Authentication OK${Reset}\n\n"
+
+    ###########################################################################
+    # List files
+    ###########################################################################
+
+    printf "${Yellow}Retrieving object list...${Reset}\n"
+
+    local LIST
+
+    if ! LIST=$(run aws s3 ls "$S3_URI" --recursive)
+    then
+        printf "${Red}Unable to list bucket${Reset}\n"
+        return 1
+    fi
+
+    mapfile -t FILES < <(
+        printf "%s\n" "$LIST" |
+        awk '{print $4}'
+    )
+
+    if (( ${#FILES[@]} == 0 ))
+    then
+        printf "${Red}No files found.${Reset}\n"
+        return 1
+    fi
+
+    ###########################################################################
+    # Checkbox Menu
+    ###########################################################################
+
+    local COUNT=${#FILES[@]}
+
+    declare -a SELECTED
+
+    local CURSOR=0
+
+    for ((i=0;i<COUNT;i++))
+    do
+        SELECTED[$i]=0
+    done
+
+    while true
+    do
+        printf "${Home}"
+
+        printf "${Bold}${Cyan}"
+        printf "CMDB Asset Downloader\n\n"
+        printf "${Reset}"
+
+        printf "Use:\n"
+        printf "  ↑ ↓  Move\n"
+        printf "  SPACE Toggle\n"
+        printf "  a     Select All\n"
+        printf "  n     None\n"
+        printf "  ENTER Download\n"
+        printf "  q     Quit\n\n"
+
+        for ((i=0;i<COUNT;i++))
+        do
+            if (( CURSOR==i ))
+            then
+                printf "${Blue}> ${Reset}"
+            else
+                printf "  "
+            fi
+
+            if (( SELECTED[i] ))
+            then
+                printf "${Green}${Checked}${Reset} "
+            else
+                printf "${White}${Box}${Reset} "
+            fi
+
+            printf "%s\n" "${FILES[i]}"
+        done
+
+        IFS= read -rsn1 KEY
+
+        case "$KEY" in
+
+            "")
+                break
+                ;;
+
+            " ")
+
+                if (( SELECTED[CURSOR] ))
+                then
+                    SELECTED[CURSOR]=0
+                else
+                    SELECTED[CURSOR]=1
+                fi
+                ;;
+
+            a)
+
+                for ((i=0;i<COUNT;i++))
+                do
+                    SELECTED[i]=1
+                done
+                ;;
+
+            n)
+
+                for ((i=0;i<COUNT;i++))
+                do
+                    SELECTED[i]=0
+                done
+                ;;
+
+            q)
+
+                printf "\nCancelled\n"
+                return
+                ;;
+
+            $'\x1b')
+
+                read -rsn2 KEY
+
+                case "$KEY" in
+                    "[A")
+                        ((CURSOR--))
+                        ;;
+
+                    "[B")
+                        ((CURSOR++))
+                        ;;
+                esac
+
+                ((CURSOR<0)) && CURSOR=0
+                ((CURSOR>=COUNT)) && CURSOR=$((COUNT-1))
+                ;;
+        esac
+    done
+
+    ###########################################################################
+    # Download
+    ###########################################################################
+
+    printf "${Clear}${Home}"
+
+    printf "${Bold}${Green}Downloading selected assets...${Reset}\n\n"
+
+    local DOWNLOADED=0
+    local FAILED=0
+
+    mkdir -p HMRC-2388
+
+    for ((i=0;i<COUNT;i++))
+    do
+        (( SELECTED[i] )) || continue
+
+        FILE="${FILES[i]}"
+
+        printf "${Yellow}Downloading %s...${Reset}\n" "$FILE"
+
+        if run aws s3 cp \
+            "s3://${BUCKET}/${FILE}" \
+            "./$(basename "$FILE")"
+        then
+            ((DOWNLOADED++))
+            printf "${Green}${Tick}${Reset}\n"
+        else
+            ((FAILED++))
+            printf "${Red}${Cross}${Reset}\n"
+        fi
+
+        printf "\n"
+    done
+
+    ###########################################################################
+    # Summary
+    ###########################################################################
+
+    local END
+    END=$(date +%s)
+
+    local ELAPSED=$((END-START_TIME))
+
+    printf "\n"
+
+    printf "${Bold}${Cyan}"
+    printf "┌─────────────────────────────────────────────────────┐\n"
+    printf "│                     Summary                         │\n"
+    printf "├─────────────────────────────────────────────────────┤\n"
+    printf "│ Downloaded : %-36d│\n" "$DOWNLOADED"
+    printf "│ Failed      : %-36d│\n" "$FAILED"
+    printf "│ Duration    : %-36ds│\n" "$ELAPSED"
+    printf "└─────────────────────────────────────────────────────┘\n"
+    printf "${Reset}"
+
+    printf "\n"
+
+    printf "${Green}Log file:${Reset}\n"
+    printf "  %s\n\n" "$LOGFILE"
+}
