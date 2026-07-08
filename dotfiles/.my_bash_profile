@@ -17,157 +17,17 @@ export COLORTERM=truecolor
 #[[ -f "${HOME}/Library/Application Support/amazon-q/shell/bashrc.pre.bash" ]] && builtin source "${HOME}/Library/Application Support/amazon-q/shell/bashrc.pre.bash"
 
 set -o vi
-[[ -e ~/.my_aliases ]] && source ~/.my_aliases
-[[ -e ~/.my_functions ]] && source ~/.my_functions
-[[ -e ~/.my_secrets ]] && source ~/.my_secrets
 [[ -e ~/.vw.function ]] && source ~/.vw.function
-
-#source /Users/morgan/.ansi.functions
-#source /Users/morgan/.datetime.functions
-#source /Users/morgan/.file.functions
-#source /Users/morgan/.include.function
-#source /Users/morgan/.logging.functions
-#source /Users/morgan/.shelper.functions
-#source /Users/morgan/.unicode.functions
-#source /Users/morgan/.vw.function
-#source ~/.shelper.functions
-
-# Added by `rbenv init` on Sat  9 Aug 2025 22:43:51 BST
-#eval "$(rbenv init - --no-rehash bash)"
+for f in $(ls -1 ~/.my_*)
+do
+  source $f
+done
 
 #´I#export CFLAGS="-arch x86_64"
 #export LDFLAGS="-arch x86_64"
 
 export OPENAI_ORGANIZATION_ID="morganism"
 
-# Amazon Q post block. Keep at the bottom of this file.
-#[[ -f "${HOME}/Library/Application Support/amazon-q/shell/bashrc.post.bash" ]] && builtin source "${HOME}/Library/Application Support/amazon-q/shell/bashrc.post.bash"
-
-
-#------------------------------------------------------------------------------
-#------------------------------------------------------------------------------
-# DIRHOOK         vvvvvvv
-#------------------------------------------------------------------------------
-#------------------------------------------------------------------------------
-# Config
-#_DIRHOOK_NAME=".dirhook"
-## set to 1 to allow automatic exec/source (not recommended)
-## export DIRHOOK_ALLOW=1
-
-#_dirhook_secure_check() {
-#  local file="$1"
-#  # must be regular file
-#  [[ -f "$file" ]] || return 1
-#  # owned by current user
-#  [[ "$(stat -c %u "$file" 2>/dev/null)" -eq "$(id -u)" ]] || return 1
-#  # not writable by group/other (mode <= 0644)
-#  local mode
-#  mode=$(stat -c %a "$file" 2>/dev/null)
-#  # deny if group/other write bit is set
-#  (( (mode & 020) == 0 && (mode & 002) == 0 )) || return 1
-#  return 0
-#}
-
-#_dirhook_parse_and_act() {
-#  local hook="$1"
-#  local allow="${DIRHOOK_ALLOW:-0}"
-#  # read key/value lines
-#  while IFS='=' read -r key val; do
-#    # skip blank or comment
-#    [[ -z "$key" || "${key:0:1}" = "#" ]] && continue
-#    key=$(echo "$key" | tr -d '[:space:]')
-#    val=$(echo "$val" | sed 's/^ *//;s/ *$//')
-#    case "$key" in
-#      message)
-#        echo -e "$val"
-#        ;;
-#      notify)
-#        if [[ "$val" -ne 0 ]]; then
-#          if [[ "$OSTYPE" == "darwin"* ]]; then
-#            osascript -e "display notification \"${val:-Entered directory}\" with title \"Directory\""
-#          else
-#            command -v notify-send >/dev/null && notify-send "Directory" "$val"
-#          fi
-#        fi
-#        ;;
-#      flags)
-#        # export a variable the observer can read
-#        export DIRHOOK_FLAGS="$val"
-#        ;;
-#      exec)
-#        if [[ "$allow" -ne 1 ]]; then
-#          echo "Notice: exec present in $hook but DIRHOOK_ALLOW not set; skipping."
-#        else
-#          if _dirhook_secure_check "$hook"; then
-#            # resolve path relative to directory
-#            local script
-#            script="$(realpath -m "$val")"
-#            [[ -x "$script" ]] || chmod +x "$script" 2>/dev/null
-#            # execute in subshell
-#            ( cd "$(dirname "$script")" && "$script" ) || echo "Exec failed: $script"
-#          else
-#            echo "Unsafe hook file, refusing to exec."
-#          fi
-#        fi
-#        ;;
-#      source)
-#        if [[ "$allow" -ne 1 ]]; then
-#          echo "Notice: source present in $hook but DIRHOOK_ALLOW not set; skipping."
-#        else
-#          if _dirhook_secure_check "$hook"; then
-#            # source the referenced file (be cautious — this runs in your current shell)
-#            # resolve relative
-#            local src
-#            src="$(realpath -m "$val")"
-#            [[ -f "$src" ]] && source "$src"
-#          else
-#            echo "Unsafe hook file, refusing to source."
-#          fi
-#        fi
-#        ;;
-#    esac
-#  done < "$hook"
-#}
-
-## override cd; also handle pushd/popd by calling builtin
-#cd() {
-#  builtin cd "$@" || return
-#  local hookfile="$PWD/$_DIRHOOK_NAME"
-#  if [[ -f "$hookfile" ]]; then
-#    _dirhook_parse_and_act "$hookfile"
-#  fi
-#}
-## optionally handle pushd/popd
-#pushd() { builtin pushd "$@" || return; local hookfile="$PWD/$_DIRHOOK_NAME"; [[ -f "$hookfile" ]] && _dirhook_parse_and_act "$hookfile"; }
-#popd()  { builtin popd  "$@" || return; local hookfile="$PWD/$_DIRHOOK_NAME"; [[ -f "$hookfile" ]] && _dirhook_parse_and_act "$hookfile"; }
-
-#------------------------------------------------------------------------------
-#------------------------------------------------------------------------------
-# DIRHOOK     ^^^^^^^^^
-#------------------------------------------------------------------------------
-#------------------------------------------------------------------------------
-if command -v ngrok &>/dev/null; then
-  eval "$(ngrok completion)"
-fi
-
-# Amazon Q post block. Keep at the bottom of this file.
-#[[ -f "${HOME}/Library/Application Support/amazon-q/shell/bash_profile.post.bash" ]] && builtin source "${HOME}/Library/Application Support/amazon-Q/SHEll/bash_profile.post.bash"
-
-#export PATH="/usr/local/Cellar/ruby/3.4.7/bin/:$HOME/.bin:$HOME/bin:/usr/local/bin:$PATH"
-#source /Users/morgan/src/erichs/composure/composure.sh
-export PS1='\[\]\H:\W \u\$ \[\]\[\]'
-#export PATH="/usr/local/sbin:$PATH"
-
-# Setting PATH for Python 3.14
-# The original version is saved in .bash_profile.pysave
-#PATH="/usr/local/Homebrew/Library/Homebrew/vendor/portable-ruby/3.4.7/include/ruby-3.4.7/ruby/bin:/usr/local/bin:/Library/Frameworks/Python.framework/Versions/3.14/bin:/Users/morgan/.local/bin:${PATH}"
-#PATH="/usr/local/Homebrew/Library/Homebrew/vendor/portable-ruby/3.4.7/include/ruby-3.4.7/ruby/bin:/usr/local/bin:/Library/Frameworks/Python.framework/Versions/3.14/bin:/Users/morgan/.local/bin:${PATH}"
-#export PATH
-
-# Dirhook Integration - Auto-generated
-#if [ -f "/Users/morgan/.config/dirhook/dirhook.sh" ]; then
-    #source "/Users/morgan/.config/dirhook/dirhook.sh"
-#fi
 
 if command -v zoxide &>/dev/null; then
   eval "$(zoxide init bash --cmd j)"
@@ -195,9 +55,6 @@ aws_sso_login () {
 
 alias aws-personal-login='aws_sso_login personal'
 
-#claude
-#anthropic-beta: BETA_FEATURE_NAME
-#
 CLAUDEMOD_OTHERS="2025-01-24"
 CLAUDEMOD_OPUS45="2025-11-24"
 BETA_FEATURE_NAME="computer-use-2025-11-24"
@@ -207,7 +64,6 @@ export XDG_CONFIG_HOME="~/.config"
 
 export PATH="/Users/morgan/bin:/usr/local/bin:/bin:/sbin/:/usr/sbin/:/usr/bin/:$PATH"
 export PATH2="$(uniqpath)"
-touch ~/XXXXXXXXXXXX
 
 : <<DOCRUBY
 
